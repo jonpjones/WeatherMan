@@ -11,6 +11,9 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
+    #import <SystemConfiguration/SystemConfiguration.h>
+    #import <MobileCoreServices/MobileCoreServices.h>
+
 
     // Define DLog to log to NSLog when DEBUG is defined
     // see http://www.cimgf.com/2010/05/02/my-current-prefix-pch-file/
