@@ -78,13 +78,13 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
 - (void)getForcastForLocationString:(NSString *)locationString withCompletionBlock:(WeatherAPICompletionBlock)completionBlock
 {
     if (!self.APIKey) {
-        NSAssert(NO, @"API Key not set");
+        NSAssert(NO, @"API Key not set", nil);
         completionBlock(NO, nil, [self missingAPIKeyError]);
         return;
     }
     
     if (![NSThread isMainThread]) {
-        NSAssert(NO, @"API client method must be called on the main thread");
+        NSAssert(NO, @"API client method must be called on the main thread", nil);
         completionBlock(NO, nil, [self genericError]);
         return;
     }
@@ -93,7 +93,7 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
     NSString *pathString = [NSString stringWithFormat:@"/api/%@%@/q/%@.json", self.APIKey, kWeatherAPIConditionsPath, locationString];
     
     // To avoid a retain cycle
-    __weak WeatherAPIClient *weakSelf = self;
+    __weak __typeof(&*self)weakSelf = self;
     
     // Start the request
     [self getPath:pathString
