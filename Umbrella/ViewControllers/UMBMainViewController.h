@@ -2,8 +2,8 @@
 //  UMBMainViewController.h
 //  Umbrella
 //
-//  Created by Ben Dolmar on 9/12/12.
-//  Copyright (c) 2012 Ben Dolmar. All rights reserved.
+//  Created by {{YOUR_NAME_HERE}} on 9/12/12.
+//  Copyright (c) 2013 {{YOUR_NAME_HERE}}. All rights reserved.
 //
 
 #import "UMBFlipsideViewController.h"
