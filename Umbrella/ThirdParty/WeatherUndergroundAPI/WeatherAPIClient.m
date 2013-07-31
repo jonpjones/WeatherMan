@@ -17,8 +17,8 @@
 @end
 
 // Base URL
-NSString * const kWeatherAPIBaseURLString = @"http://api.wunderground.com/";
-NSString * const kWeatherAPIConditionsPath = @"/conditions/hourly";
+static NSString * const kWeatherAPIBaseURLString = @"http://api.wunderground.com/";
+static NSString * const kWeatherAPIConditionsPath = @"/conditions/hourly";
 
 // Custom error domain and codes
 NSString * const kWeatherAPIClientErrorDomain = @"com.nerdery.weather";
@@ -31,6 +31,7 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
 
 + (WeatherAPIClient *)sharedClient
 {
+    // proper care of singletons - http://www.mikeash.com/pyblog/friday-qa-2009-10-02-care-and-feeding-of-singletons.html
     static WeatherAPIClient *_sharedClient = nil;
     static dispatch_once_t oncePredicate;
     dispatch_once(&oncePredicate, ^{
@@ -52,13 +53,6 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
     
     // Set the default Accept HTTP Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1
     [self setDefaultHeader:@"Accept" value:@"application/json"];
-    
-    //    // Listen for the app coming back from the background
-    //    [[NSNotificationCenter defaultCenter] addObserver:self
-    //                                             selector:@selector(applicationWillEnterForegroundNotificationRecieved:)
-    //                                                 name:UIApplicationWillEnterForegroundNotification
-    //                                               object:[UIApplication sharedApplication]];
-    
     return self;
 }
 
@@ -67,12 +61,6 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
 - (void)getForcastAndConditionsForZipCode:(NSString *)zipCode withCompletionBlock:(WeatherAPICompletionBlock)completionBlock
 {
     [self getForcastForLocationString:zipCode withCompletionBlock:completionBlock];
-}
-
-- (void)getForcastAndConditionsForLocation:(CLLocation *)location withCompletionBlock:(WeatherAPICompletionBlock)completionBlock
-{
-    NSString *locationString = [NSString stringWithFormat:@"%f,%f", location.coordinate.latitude, location.coordinate.longitude];
-    [self getForcastForLocationString:locationString withCompletionBlock:completionBlock];
 }
 
 - (void)getForcastForLocationString:(NSString *)locationString withCompletionBlock:(WeatherAPICompletionBlock)completionBlock
@@ -93,7 +81,7 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
     NSString *pathString = [NSString stringWithFormat:@"/api/%@%@/q/%@.json", self.APIKey, kWeatherAPIConditionsPath, locationString];
     
     // To avoid a retain cycle
-    __weak __typeof(&*self)weakSelf = self;
+    __weak __typeof(self)weakSelf = self;
     
     // Start the request
     [self getPath:pathString
