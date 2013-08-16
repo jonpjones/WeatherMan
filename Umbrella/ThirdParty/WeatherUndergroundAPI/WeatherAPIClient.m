@@ -10,7 +10,6 @@
 
 @interface WeatherAPIClient ()
 
-- (void)getForcastForLocationString:(NSString *)locationString withCompletionBlock:(WeatherAPICompletionBlock)completionBlock;
 - (NSError *)genericError;
 - (NSError *)missingAPIKeyError;
 
@@ -47,69 +46,57 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
     if (!self) {
         return nil;
     }
+        
+    self.responseSerializers = @[[AFJSONSerializer serializer]];
     
-    // Set the default request class
-    [self registerHTTPOperationClass:[AFJSONRequestOperation class]];
-    
-    // Set the default Accept HTTP Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1
-    [self setDefaultHeader:@"Accept" value:@"application/json"];
     return self;
 }
 
 #pragma mark - API calls
 
-- (void)getForcastAndConditionsForZipCode:(NSString *)zipCode withCompletionBlock:(WeatherAPICompletionBlock)completionBlock
-{
-    [self getForcastForLocationString:zipCode withCompletionBlock:completionBlock];
-}
-
-- (void)getForcastForLocationString:(NSString *)locationString withCompletionBlock:(WeatherAPICompletionBlock)completionBlock
+- (NSURLSessionDataTask *)getForecastAndConditionsForZipCode:(NSString *)zipCode withCompletionBlock:(WeatherAPICompletionBlock)completionBlock
 {
     if (!self.APIKey) {
         NSAssert(NO, @"API Key not set", nil);
         completionBlock(NO, nil, [self missingAPIKeyError]);
-        return;
+        return nil;
     }
     
     if (![NSThread isMainThread]) {
         NSAssert(NO, @"API client method must be called on the main thread", nil);
         completionBlock(NO, nil, [self genericError]);
-        return;
+        return nil;
     }
     
     // Create the path
-    NSString *pathString = [NSString stringWithFormat:@"/api/%@%@/q/%@.json", self.APIKey, kWeatherAPIConditionsPath, locationString];
+    NSString *pathString = [NSString stringWithFormat:@"/api/%@%@/q/%@.json", self.APIKey, kWeatherAPIConditionsPath, zipCode];
     
     // To avoid a retain cycle
     __weak __typeof(self)weakSelf = self;
     
     // Start the request
-    [self getPath:pathString
-       parameters:nil
-          success:^(AFHTTPRequestOperation *operation, id responseObject) {
-              // Check the responseObject
-              if (!responseObject || ![responseObject isKindOfClass:[NSDictionary class]] || [responseObject count] == 0) {
-                  DLog(@"Invalid responseObject: %@", responseObject);
-                  completionBlock(NO, nil, [self genericError]);
-                  return;
-              }
-              
-              completionBlock(YES, responseObject, nil);
-          }
-          failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-              NSLog(@"Error with getForcastForLocation response: %@", error);
-              completionBlock(NO, nil, [weakSelf genericError]);
-          }
-     ];
+    NSURLSessionDataTask *task = [self GET:pathString parameters:nil success:^(NSHTTPURLResponse *response, id responseObject) {
+        // Check the responseObject
+        if (!responseObject || ![responseObject isKindOfClass:[NSDictionary class]] || [responseObject count] == 0) {
+            DLog(@"Invalid responseObject: %@", responseObject);
+            completionBlock(NO, nil, [weakSelf genericError]);
+            return;
+        }
+        
+        completionBlock(YES, responseObject, nil);
+    } failure:^(NSError *error) {
+        NSLog(@"Error with getForcastForLocation response: %@", error);
+        completionBlock(NO, nil, error);
+    }];
     
-    return;
+    return task;
 }
 
 #pragma mark - Errors
 
 - (NSError *)genericError
 {
-    NSString *localizedParsingErrorDescription = NSLocalizedString(@"There was an error communicating with the Weather Underground server. Please check your internet connection and try again later.", @"Generic failure error message");
+    NSString *localizedParsingErrorDescription = NSLocalizedString(@"Unknown response from the Weather Underground server.", @"Generic failure error message");
     return [NSError errorWithDomain:kWeatherAPIClientErrorDomain
                                code:kWeatherAPIClientErrorCodeGeneric
                            userInfo:[NSDictionary dictionaryWithObject:localizedParsingErrorDescription forKey:NSLocalizedDescriptionKey]];

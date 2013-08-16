@@ -1,6 +1,6 @@
 // AFHTTPClient.h
 //
-// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+// Copyright (c) 2013 AFNetworking (http://afnetworking.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,17 @@
 // THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-#import "AFURLConnectionOperation.h"
-
+#import <SystemConfiguration/SystemConfiguration.h>
 #import <Availability.h>
+
+#if __IPHONE_OS_VERSION_MIN_REQUIRED
+#import <MobileCoreServices/MobileCoreServices.h>
+#else
+#import <CoreServices/CoreServices.h>
+#endif
+
+#import "AFURLSessionManager.h"
+#import "AFSerialization.h"
 
 /**
  `AFHTTPClient` captures the common patterns of communicating with an web application over HTTP. It encapsulates information like base URL, authorization credentials, and HTTP headers, and uses them to construct and manage the execution of HTTP request operations.
@@ -73,35 +81,15 @@
  - NSCoding cannot serialize / deserialize block properties, so an archive of an HTTP client will not include any reachability callback block that may be set.
  */
 
-#ifdef _SYSTEMCONFIGURATION_H
-typedef enum {
+typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
     AFNetworkReachabilityStatusUnknown          = -1,
     AFNetworkReachabilityStatusNotReachable     = 0,
     AFNetworkReachabilityStatusReachableViaWWAN = 1,
     AFNetworkReachabilityStatusReachableViaWiFi = 2,
-} AFNetworkReachabilityStatus;
-#else
-#pragma message("SystemConfiguration framework not found in project, or not included in precompiled header. Network reachability functionality will not be available.")
-#endif
+};
 
-#ifndef __UTTYPE__
-#if __IPHONE_OS_VERSION_MIN_REQUIRED
-#pragma message("MobileCoreServices framework not found in project, or not included in precompiled header. Automatic MIME type detection when uploading files in multipart requests will not be available.")
-#else
-#pragma message("CoreServices framework not found in project, or not included in precompiled header. Automatic MIME type detection when uploading files in multipart requests will not be available.")
-#endif
-#endif
-
-typedef enum {
-    AFFormURLParameterEncoding,
-    AFJSONParameterEncoding,
-    AFPropertyListParameterEncoding,
-} AFHTTPClientParameterEncoding;
-
-@class AFHTTPRequestOperation;
 @protocol AFMultipartFormData;
-
-@interface AFHTTPClient : NSObject <NSCoding, NSCopying>
+@interface AFHTTPClient : AFURLSessionManager <NSCoding, NSCopying>
 
 ///---------------------------------------
 /// @name Accessing HTTP Client Properties
@@ -113,41 +101,28 @@ typedef enum {
 @property (readonly, nonatomic, strong) NSURL *baseURL;
 
 /**
- The string encoding used in constructing url requests. This is `NSUTF8StringEncoding` by default.
+
  */
-@property (nonatomic, assign) NSStringEncoding stringEncoding;
+@property (nonatomic, strong) id <AFURLRequestSerialization> requestSerializer;
 
 /**
- The `AFHTTPClientParameterEncoding` value corresponding to how parameters are encoded into a request body. This is `AFFormURLParameterEncoding` by default.
 
- @warning Some nested parameter structures, such as a keyed array of hashes containing inconsistent keys (i.e. `@{@"": @[@{@"a" : @(1)}, @{@"b" : @(2)}]}`), cannot be unambiguously represented in query strings. It is strongly recommended that an unambiguous encoding, such as `AFJSONParameterEncoding`, is used when posting complicated or nondeterministic parameter structures.
  */
-@property (nonatomic, assign) AFHTTPClientParameterEncoding parameterEncoding;
-
-/**
- The operation queue which manages operations enqueued by the HTTP client.
- */
-@property (readonly, nonatomic, strong) NSOperationQueue *operationQueue;
+@property (nonatomic, strong) NSArray *responseSerializers;
 
 /**
  The reachability status from the device to the current `baseURL` of the `AFHTTPClient`.
-
- @warning This property requires the `SystemConfiguration` framework. Add it in the active target's "Link Binary With Library" build phase, and add `#import <SystemConfiguration/SystemConfiguration.h>` to the header prefix of the project (`Prefix.pch`).
  */
-#ifdef _SYSTEMCONFIGURATION_H
 @property (readonly, nonatomic, assign) AFNetworkReachabilityStatus networkReachabilityStatus;
-#endif
 
 /**
  Default SSL pinning mode for each `AFHTTPRequestOperation` created by `HTTPRequestOperationWithRequest:success:failure:`.
  */
-#ifdef _AFNETWORKING_PIN_SSL_CERTIFICATES_
-@property (nonatomic, assign) AFURLConnectionOperationSSLPinningMode defaultSSLPinningMode;
-#endif
+@property (nonatomic, assign) AFURLConnectionOperationSSLPinningMode SSLPinningMode;
 
 /**
- Whether each `AFHTTPRequestOperation` created by `HTTPRequestOperationWithRequest:success:failure:` should accept an invalid SSL certificate. 
- 
+ Whether each `AFHTTPRequestOperation` created by `HTTPRequestOperationWithRequest:success:failure:` should accept an invalid SSL certificate.
+
  If `_AFNETWORKING_ALLOW_INVALID_SSL_CERTIFICATES_` is set, this property defaults to `YES` for backwards compatibility. Otherwise, this property defaults to `NO`.
  */
 @property (nonatomic, assign) BOOL allowsInvalidSSLCertificate;
@@ -157,13 +132,9 @@ typedef enum {
 ///---------------------------------------------
 
 /**
- Creates and initializes an `AFHTTPClient` object with the specified base URL.
-
- @param url The base URL for the HTTP client. This argument must not be `nil`.
-
- @return The newly-initialized HTTP client
+ 
  */
-+ (instancetype)clientWithBaseURL:(NSURL *)url;
++ (instancetype)client;
 
 /**
  Initializes an `AFHTTPClient` object with the specified base URL.
@@ -174,7 +145,13 @@ typedef enum {
 
  @return The newly-initialized HTTP client
  */
-- (id)initWithBaseURL:(NSURL *)url;
+- (instancetype)initWithBaseURL:(NSURL *)url;
+
+/**
+ 
+ */
+- (instancetype)initWithBaseURL:(NSURL *)url
+           sessionConfiguration:(NSURLSessionConfiguration *)configuration;
 
 ///-----------------------------------
 /// @name Managing Reachability Status
@@ -190,83 +167,6 @@ typedef enum {
 #ifdef _SYSTEMCONFIGURATION_H
 - (void)setReachabilityStatusChangeBlock:(void (^)(AFNetworkReachabilityStatus status))block;
 #endif
-
-///-------------------------------
-/// @name Managing HTTP Operations
-///-------------------------------
-
-/**
- Attempts to register a subclass of `AFHTTPRequestOperation`, adding it to a chain to automatically generate request operations from a URL request.
-
- When `enqueueHTTPRequestOperationWithRequest:success:failure` is invoked, each registered class is consulted in turn to see if it can handle the specific request. The first class to return `YES` when sent a `canProcessRequest:` message is used to create an operation using `initWithURLRequest:` and do `setCompletionBlockWithSuccess:failure:`. There is no guarantee that all registered classes will be consulted. Classes are consulted in the reverse order of their registration. Attempting to register an already-registered class will move it to the top of the list.
- 
- @param operationClass The subclass of `AFHTTPRequestOperation` to register
-
- @return `YES` if the registration is successful, `NO` otherwise. The only failure condition is if `operationClass` is not a subclass of `AFHTTPRequestOperation`.
- */
-- (BOOL)registerHTTPOperationClass:(Class)operationClass;
-
-/**
- Unregisters the specified subclass of `AFHTTPRequestOperation` from the chain of classes consulted when `-requestWithMethod:path:parameters` is called.
-
- @param operationClass The subclass of `AFHTTPRequestOperation` to register
- */
-- (void)unregisterHTTPOperationClass:(Class)operationClass;
-
-///----------------------------------
-/// @name Managing HTTP Header Values
-///----------------------------------
-
-/**
- Returns the value for the HTTP headers set in request objects created by the HTTP client.
-
- @param header The HTTP header to return the default value for
-
- @return The default value for the HTTP header, or `nil` if unspecified
- */
-- (NSString *)defaultValueForHeader:(NSString *)header;
-
-/**
- Sets the value for the HTTP headers set in request objects made by the HTTP client. If `nil`, removes the existing value for that header.
-
- @param header The HTTP header to set a default value for
- @param value The value set as default for the specified header, or `nil
- */
-- (void)setDefaultHeader:(NSString *)header
-                   value:(NSString *)value;
-
-/**
- Sets the "Authorization" HTTP header set in request objects made by the HTTP client to a basic authentication value with Base64-encoded username and password. This overwrites any existing value for this header.
-
- @param username The HTTP basic auth username
- @param password The HTTP basic auth password
- */
-- (void)setAuthorizationHeaderWithUsername:(NSString *)username
-                                  password:(NSString *)password;
-
-/**
- Sets the "Authorization" HTTP header set in request objects made by the HTTP client to a token-based authentication value, such as an OAuth access token. This overwrites any existing value for this header.
-
- @param token The authentication token
- */
-- (void)setAuthorizationHeaderWithToken:(NSString *)token;
-
-
-/**
- Clears any existing value for the "Authorization" HTTP header.
- */
-- (void)clearAuthorizationHeader;
-
-///-------------------------------
-/// @name Managing URL Credentials
-///-------------------------------
-
-/**
- Set the default URL credential to be set for request operations.
-
- @param credential The URL credential
- */
-- (void)setDefaultCredential:(NSURLCredential *)credential;
 
 ///-------------------------------
 /// @name Creating Request Objects
@@ -295,8 +195,8 @@ typedef enum {
  @param method The HTTP method for the request. This parameter must not be `GET` or `HEAD`, or `nil`.
  @param path The path to be appended to the HTTP client's base URL and used as the request URL.
  @param parameters The parameters to be encoded and set in the request HTTP body.
- @param block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol. This can be used to upload files, encode HTTP body as JSON or XML, or specify multiple values for the same parameter, as one might for array values.
-
+ @param block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol. 
+ 
  @return An `NSMutableURLRequest` object
  */
 - (NSMutableURLRequest *)multipartFormRequestWithMethod:(NSString *)method
@@ -311,13 +211,11 @@ typedef enum {
 /**
  Creates an `AFHTTPRequestOperation`.
 
- In order to determine what kind of operation is created, each registered subclass conforming to the `AFHTTPClient` protocol is consulted (in reverse order of when they were specified) to see if it can handle the specific request. The first class to return `YES` when sent a `canProcessRequest:` message is used to generate an operation using `HTTPRequestOperationWithRequest:success:failure:`.
-
  @param urlRequest The request object to be loaded asynchronously during execution of the operation.
  @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
  @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
  */
-- (AFHTTPRequestOperation *)HTTPRequestOperationWithRequest:(NSURLRequest *)urlRequest
+- (AFHTTPRequestOperation *)HTTPRequestOperationWithRequest:(NSURLRequest *)request
                                                     success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
                                                     failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
@@ -334,13 +232,14 @@ typedef enum {
 
 /**
  Cancels all operations in the HTTP client's operation queue whose URLs match the specified HTTP method and path.
- 
+
  This method only cancels `AFHTTPRequestOperations` whose request URL matches the HTTP client base URL with the path appended. For complete control over the lifecycle of enqueued operations, you can access the `operationQueue` property directly, which allows you to, for instance, cancel operations filtered by a predicate, or simply use `-cancelAllRequests`. Note that the operation queue may include non-HTTP operations, so be sure to check the type before attempting to directly introspect an operation's `request` property.
 
  @param method The HTTP method to match for the cancelled requests, such as `GET`, `POST`, `PUT`, or `DELETE`. If `nil`, all request operations with URLs matching the path will be cancelled.
  @param path The path appended to the HTTP client base URL to match against the cancelled requests. If `nil`, no path will be appended to the base URL.
  */
-- (void)cancelAllHTTPOperationsWithMethod:(NSString *)method path:(NSString *)path;
+- (void)cancelAllHTTPOperationsWithMethod:(NSString *)method
+                                     path:(NSString *)path;
 
 ///---------------------------------------
 /// @name Batching HTTP Request Operations
@@ -350,12 +249,12 @@ typedef enum {
  Creates and enqueues an `AFHTTPRequestOperation` to the HTTP client's operation queue for each specified request object into a batch. When each request operation finishes, the specified progress block is executed, until all of the request operations have finished, at which point the completion block also executes.
 
  Operations are created by passing the specified `NSURLRequest` objects in `requests`, using `-HTTPRequestOperationWithRequest:success:failure:`, with `nil` for both the `success` and `failure` parameters.
- 
+
  @param urlRequests The `NSURLRequest` objects used to create and enqueue operations.
  @param progressBlock A block object to be executed upon the completion of each request operation in the batch. This block has no return value and takes two arguments: the number of operations that have already finished execution, and the total number of operations.
  @param completionBlock A block object to be executed upon the completion of all of the request operations in the batch. This block has no return value and takes a single argument: the batched request operations.
  */
-- (void)enqueueBatchOfHTTPRequestOperationsWithRequests:(NSArray *)urlRequests
+- (void)enqueueBatchOfHTTPRequestOperationsWithRequests:(NSArray *)requests
                                           progressBlock:(void (^)(NSUInteger numberOfFinishedOperations, NSUInteger totalNumberOfOperations))progressBlock
                                         completionBlock:(void (^)(NSArray *operations))completionBlock;
 
@@ -375,79 +274,166 @@ typedef enum {
 ///---------------------------
 
 /**
- Creates an `AFHTTPRequestOperation` with a `GET` request, and enqueues it to the HTTP client's operation queue.
+ Creates and runs an `NSURLSessionDataTask` with a `GET` request.
 
  @param path The path to be appended to the HTTP client's base URL and used as the request URL.
- @param parameters The parameters to be encoded and appended as the query string for the request URL.
- @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
- @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments: the created request operation and the `NSError` object describing the network or parsing error that occurred.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the task finishes successfully. This block has no return value and takes two arguments: the server response, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a single arguments: the error describing the network or parsing error that occurred.
 
- @see -HTTPRequestOperationWithRequest:success:failure:
+ @see -runDataTaskWithRequest:success:failure:
  */
-- (void)getPath:(NSString *)path
-     parameters:(NSDictionary *)parameters
-        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (NSURLSessionDataTask *)GET:(NSString *)URLString
+                   parameters:(NSDictionary *)parameters
+                      success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                      failure:(void (^)(NSError *error))failure;
 
 /**
- Creates an `AFHTTPRequestOperation` with a `POST` request, and enqueues it to the HTTP client's operation queue.
+ Creates and runs an `NSURLSessionDataTask` with a `HEAD` request.
 
  @param path The path to be appended to the HTTP client's base URL and used as the request URL.
- @param parameters The parameters to be encoded and set in the request HTTP body.
- @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
- @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments: the created request operation and the `NSError` object describing the network or parsing error that occurred.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the task finishes successfully. This block has no return value and takes a single arguments: the server response.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a single arguments: the error describing the network or parsing error that occurred.
 
- @see -HTTPRequestOperationWithRequest:success:failure:
+ @see -runDataTaskWithRequest:success:failure:
  */
-- (void)postPath:(NSString *)path
-      parameters:(NSDictionary *)parameters
-         success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (NSURLSessionDataTask *)HEAD:(NSString *)URLString
+                    parameters:(NSDictionary *)parameters
+                       success:(void (^)(NSHTTPURLResponse *response))success
+                       failure:(void (^)(NSError *error))failure;
 
 /**
- Creates an `AFHTTPRequestOperation` with a `PUT` request, and enqueues it to the HTTP client's operation queue.
+ Creates and runs an `NSURLSessionDataTask` with a `POST` request.
 
  @param path The path to be appended to the HTTP client's base URL and used as the request URL.
- @param parameters The parameters to be encoded and set in the request HTTP body.
- @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
- @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments: the created request operation and the `NSError` object describing the network or parsing error that occurred.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the task finishes successfully. This block has no return value and takes two arguments: the server response, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a single arguments: the error describing the network or parsing error that occurred.
 
- @see -HTTPRequestOperationWithRequest:success:failure:
+ @see -runDataTaskWithRequest:success:failure:
  */
-- (void)putPath:(NSString *)path
-     parameters:(NSDictionary *)parameters
-        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (NSURLSessionDataTask *)POST:(NSString *)URLString
+                    parameters:(NSDictionary *)parameters
+                       success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                       failure:(void (^)(NSError *error))failure;
 
 /**
- Creates an `AFHTTPRequestOperation` with a `DELETE` request, and enqueues it to the HTTP client's operation queue.
+ Creates and runs an `NSURLSessionDataTask` with a multipart `POST` request.
 
  @param path The path to be appended to the HTTP client's base URL and used as the request URL.
- @param parameters The parameters to be encoded and appended as the query string for the request URL.
- @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
- @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments: the created request operation and the `NSError` object describing the network or parsing error that occurred.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol.
+ @param success A block object to be executed when the task finishes successfully. This block has no return value and takes two arguments: the server response, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a single arguments: the error describing the network or parsing error that occurred.
 
- @see -HTTPRequestOperationWithRequest:success:failure:
+ @see -runDataTaskWithRequest:success:failure:
  */
-- (void)deletePath:(NSString *)path
-        parameters:(NSDictionary *)parameters
-           success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-           failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (NSURLSessionDataTask *)POST:(NSString *)URLString
+                    parameters:(NSDictionary *)parameters
+     constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
+                       success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                       failure:(void (^)(NSError *error))failure;
 
 /**
- Creates an `AFHTTPRequestOperation` with a `PATCH` request, and enqueues it to the HTTP client's operation queue.
+ Creates and runs an `NSURLSessionDataTask` with a `PUT` request.
 
  @param path The path to be appended to the HTTP client's base URL and used as the request URL.
- @param parameters The parameters to be encoded and set in the request HTTP body.
- @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
- @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments: the created request operation and the `NSError` object describing the network or parsing error that occurred.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the task finishes successfully. This block has no return value and takes two arguments: the server response, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a single arguments: the error describing the network or parsing error that occurred.
 
- @see -HTTPRequestOperationWithRequest:success:failure:
+ @see -runDataTaskWithRequest:success:failure:
  */
-- (void)patchPath:(NSString *)path
-       parameters:(NSDictionary *)parameters
-          success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-          failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (NSURLSessionDataTask *)PUT:(NSString *)URLString
+                   parameters:(NSDictionary *)parameters
+                      success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                      failure:(void (^)(NSError *error))failure;
+
+/**
+ Creates and runs an `NSURLSessionDataTask` with a `PATCH` request.
+
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the task finishes successfully. This block has no return value and takes two arguments: the server response, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a single arguments: the error describing the network or parsing error that occurred.
+
+ @see -runDataTaskWithRequest:success:failure:
+ */
+- (NSURLSessionDataTask *)PATCH:(NSString *)URLString
+                     parameters:(NSDictionary *)parameters
+                        success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                        failure:(void (^)(NSError *error))failure;
+
+/**
+ Creates and runs an `NSURLSessionDataTask` with a `DELETE` request.
+
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the task finishes successfully. This block has no return value and takes two arguments: the server response, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a single arguments: the error describing the network or parsing error that occurred.
+
+ @see -runDataTaskWithRequest:success:failure:
+ */
+- (NSURLSessionDataTask *)DELETE:(NSString *)URLString
+                      parameters:(NSDictionary *)parameters
+                         success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                         failure:(void (^)(NSError *error))failure;
+
+///-------------------------
+/// @name Running Data Tasks
+///-------------------------
+
+/**
+ 
+ */
+- (NSURLSessionDataTask *)runDataTaskWithRequest:(NSURLRequest *)request
+                                         success:(void (^)(NSHTTPURLResponse *response, id <AFURLResponseSerialization> serializer, id responseObject))success
+                                         failure:(void (^)(NSError *error))failure;
+
+
+///---------------------------
+/// @name Running Upload Tasks
+///---------------------------
+
+/**
+ 
+ */
+- (NSURLSessionUploadTask *)runUploadTaskWithRequest:(NSURLRequest *)request
+                                            fromFile:(NSURL *)fileURL
+                                            progress:(void (^)(uint32_t bytesWritten, uint32_t totalBytesWritten, uint32_t totalBytesExpectedToWrite))progress
+                                             success:(void (^)(NSHTTPURLResponse *response, id <AFURLResponseSerialization> serializer, id responseObject))success
+                                             failure:(void (^)(NSError *error))failure;
+
+/**
+ 
+ */
+- (NSURLSessionUploadTask *)runUploadTaskWithRequest:(NSURLRequest *)request
+                                            fromData:(NSData *)bodyData
+                                            progress:(void (^)(uint32_t bytesWritten, uint32_t totalBytesWritten, uint32_t totalBytesExpectedToWrite))progress
+                                             success:(void (^)(NSHTTPURLResponse *response, id <AFURLResponseSerialization> serializer, id responseObject))success
+                                             failure:(void (^)(NSError *error))failure;
+
+///-----------------------------
+/// @name Running Download Tasks
+///-----------------------------
+
+/**
+ 
+ */
+- (NSURLSessionDownloadTask *)runDownloadTaskWithRequest:(NSURLRequest *)request
+                                                progress:(void (^)(uint32_t bytesRead, uint32_t totalBytesRead, uint32_t totalBytesExpectedToRead))progress
+                                                 success:(NSURL * (^)(NSHTTPURLResponse *response))success
+                                                 failure:(void (^)(NSError *error))failure;
+
+/**
+ 
+ */
+- (NSURLSessionDownloadTask *)runDownloadTaskWithResumeData:(NSData *)resumeData
+                                                   progress:(void (^)(uint32_t bytesRead, uint32_t totalBytesRead, uint32_t totalBytesExpectedToRead))progress
+                                                    success:(NSURL * (^)(NSHTTPURLResponse *response))success
+                                                    failure:(void (^)(NSError *error))failure;
+
 @end
 
 ///----------------
@@ -505,24 +491,6 @@ typedef enum {
  `AFPropertyListParameterEncoding`
  Parameters are encoded into a property list in the message body.
  */
-
-///----------------
-/// @name Functions
-///----------------
-
-/**
- Returns a query string constructed by a set of parameters, using the specified encoding.
-
- Query strings are constructed by collecting each key-value pair, percent escaping a string representation of the key-value pair, and then joining the pairs with "&".
- 
- If a query string pair has a an `NSArray` for its value, each member of the array will be represented in the format `field[]=value1&field[]value2`. Otherwise, the pair will be formatted as "field=value". String representations of both keys and values are derived using the `-description` method. The constructed query string does not include the ? character used to delimit the query component.
- 
- @param parameters The parameters used to construct the query string
- @param encoding The encoding to use in constructing the query string. If you are uncertain of the correct encoding, you should use UTF-8 (`NSUTF8StringEncoding`), which is the encoding designated by RFC 3986 as the correct encoding for use in URLs.
-
- @return A percent-escaped query string
- */
-extern NSString * AFQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSStringEncoding encoding);
 
 ///--------------------
 /// @name Notifications
@@ -593,7 +561,7 @@ extern NSTimeInterval const kAFUploadStream3GSuggestedDelay;
 - (void)appendPartWithInputStream:(NSInputStream *)inputStream
                              name:(NSString *)name
                          fileName:(NSString *)fileName
-                           length:(unsigned long long)length
+                           length:(int64_t)length
                          mimeType:(NSString *)mimeType;
 
 /**

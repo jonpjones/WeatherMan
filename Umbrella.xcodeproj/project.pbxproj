@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		445B84E417271B060072E66C /* UMBFlipsideViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 445B84E317271B060072E66C /* UMBFlipsideViewController.xib */; };
 		445B84E617271B140072E66C /* UMBMainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 445B84E517271B140072E66C /* UMBMainViewController.xib */; };
 		585688AD160131D600AD5C9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688AC160131D600AD5C9D /* UIKit.framework */; };
 		585688AF160131D600AD5C9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688AE160131D600AD5C9D /* Foundation.framework */; };
@@ -15,14 +14,12 @@
 		585688B7160131D600AD5C9D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 585688B5160131D600AD5C9D /* InfoPlist.strings */; };
 		585688B9160131D600AD5C9D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 585688B8160131D600AD5C9D /* main.m */; };
 		585688BD160131D600AD5C9D /* UMBAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 585688BC160131D600AD5C9D /* UMBAppDelegate.m */; };
-		588A8A521603C089002350AF /* UMBFlipsideViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 588A8A4F1603C089002350AF /* UMBFlipsideViewController.m */; };
 		588A8A531603C089002350AF /* UMBMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 588A8A511603C089002350AF /* UMBMainViewController.m */; };
 		588A8A591603C092002350AF /* WeatherAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 588A8A581603C092002350AF /* WeatherAPIClient.m */; };
 		E5A345C7EBAC49E790C9337A /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C37B9BB51D4B41438758A4B9 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		445B84E317271B060072E66C /* UMBFlipsideViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UMBFlipsideViewController.xib; sourceTree = "<group>"; };
 		445B84E517271B140072E66C /* UMBMainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UMBMainViewController.xib; sourceTree = "<group>"; };
 		585688A8160131D600AD5C9D /* Umbrella.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Umbrella.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		585688AC160131D600AD5C9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -34,8 +31,6 @@
 		585688BA160131D600AD5C9D /* Umbrella-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Umbrella-Prefix.pch"; sourceTree = "<group>"; };
 		585688BB160131D600AD5C9D /* UMBAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UMBAppDelegate.h; sourceTree = "<group>"; };
 		585688BC160131D600AD5C9D /* UMBAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UMBAppDelegate.m; sourceTree = "<group>"; };
-		588A8A4E1603C089002350AF /* UMBFlipsideViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UMBFlipsideViewController.h; sourceTree = "<group>"; };
-		588A8A4F1603C089002350AF /* UMBFlipsideViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UMBFlipsideViewController.m; sourceTree = "<group>"; };
 		588A8A501603C089002350AF /* UMBMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UMBMainViewController.h; sourceTree = "<group>"; };
 		588A8A511603C089002350AF /* UMBMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UMBMainViewController.m; sourceTree = "<group>"; };
 		588A8A571603C092002350AF /* WeatherAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeatherAPIClient.h; sourceTree = "<group>"; };
@@ -114,9 +109,6 @@
 		588A8A4D1603C089002350AF /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				588A8A4E1603C089002350AF /* UMBFlipsideViewController.h */,
-				588A8A4F1603C089002350AF /* UMBFlipsideViewController.m */,
-				445B84E317271B060072E66C /* UMBFlipsideViewController.xib */,
 				588A8A501603C089002350AF /* UMBMainViewController.h */,
 				588A8A511603C089002350AF /* UMBMainViewController.m */,
 				445B84E517271B140072E66C /* UMBMainViewController.xib */,
@@ -195,7 +187,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				585688B7160131D600AD5C9D /* InfoPlist.strings in Resources */,
-				445B84E417271B060072E66C /* UMBFlipsideViewController.xib in Resources */,
 				445B84E617271B140072E66C /* UMBMainViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -226,7 +217,6 @@
 			files = (
 				585688B9160131D600AD5C9D /* main.m in Sources */,
 				585688BD160131D600AD5C9D /* UMBAppDelegate.m in Sources */,
-				588A8A521603C089002350AF /* UMBFlipsideViewController.m in Sources */,
 				588A8A531603C089002350AF /* UMBMainViewController.m in Sources */,
 				588A8A591603C092002350AF /* WeatherAPIClient.m in Sources */,
 			);

@@ -1,6 +1,6 @@
 // AFHTTPClient.m
 //
-// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+// Copyright (c) 2013 AFNetworking (http://afnetworking.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,256 +45,7 @@ NSString * const AFNetworkingReachabilityNotificationStatusItem = @"AFNetworking
 
 typedef SCNetworkReachabilityRef AFNetworkReachabilityRef;
 typedef void (^AFNetworkReachabilityStatusBlock)(AFNetworkReachabilityStatus status);
-#else
-typedef id AFNetworkReachabilityRef;
-#endif
 
-typedef void (^AFCompletionBlock)(void);
-
-static NSString * AFBase64EncodedStringFromString(NSString *string) {
-    NSData *data = [NSData dataWithBytes:[string UTF8String] length:[string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]];
-    NSUInteger length = [data length];
-    NSMutableData *mutableData = [NSMutableData dataWithLength:((length + 2) / 3) * 4];
-
-    uint8_t *input = (uint8_t *)[data bytes];
-    uint8_t *output = (uint8_t *)[mutableData mutableBytes];
-
-    for (NSUInteger i = 0; i < length; i += 3) {
-        NSUInteger value = 0;
-        for (NSUInteger j = i; j < (i + 3); j++) {
-            value <<= 8;
-            if (j < length) {
-                value |= (0xFF & input[j]);
-            }
-        }
-
-        static uint8_t const kAFBase64EncodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-        NSUInteger idx = (i / 3) * 4;
-        output[idx + 0] = kAFBase64EncodingTable[(value >> 18) & 0x3F];
-        output[idx + 1] = kAFBase64EncodingTable[(value >> 12) & 0x3F];
-        output[idx + 2] = (i + 1) < length ? kAFBase64EncodingTable[(value >> 6)  & 0x3F] : '=';
-        output[idx + 3] = (i + 2) < length ? kAFBase64EncodingTable[(value >> 0)  & 0x3F] : '=';
-    }
-
-    return [[NSString alloc] initWithData:mutableData encoding:NSASCIIStringEncoding];
-}
-
-static NSString * AFPercentEscapedQueryStringPairMemberFromStringWithEncoding(NSString *string, NSStringEncoding encoding) {
-    static NSString * const kAFCharactersToBeEscaped = @":/?&=;+!@#$()',*";
-    static NSString * const kAFCharactersToLeaveUnescaped = @"[].";
-
-	return (__bridge_transfer  NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (__bridge CFStringRef)string, (__bridge CFStringRef)kAFCharactersToLeaveUnescaped, (__bridge CFStringRef)kAFCharactersToBeEscaped, CFStringConvertNSStringEncodingToEncoding(encoding));
-}
-
-#pragma mark -
-
-@interface AFQueryStringPair : NSObject
-@property (readwrite, nonatomic, strong) id field;
-@property (readwrite, nonatomic, strong) id value;
-
-- (id)initWithField:(id)field value:(id)value;
-
-- (NSString *)URLEncodedStringValueWithEncoding:(NSStringEncoding)stringEncoding;
-@end
-
-@implementation AFQueryStringPair
-@synthesize field = _field;
-@synthesize value = _value;
-
-- (id)initWithField:(id)field value:(id)value {
-    self = [super init];
-    if (!self) {
-        return nil;
-    }
-
-    self.field = field;
-    self.value = value;
-
-    return self;
-}
-
-- (NSString *)URLEncodedStringValueWithEncoding:(NSStringEncoding)stringEncoding {
-    if (!self.value || [self.value isEqual:[NSNull null]]) {
-        return AFPercentEscapedQueryStringPairMemberFromStringWithEncoding([self.field description], stringEncoding);
-    } else {
-        return [NSString stringWithFormat:@"%@=%@", AFPercentEscapedQueryStringPairMemberFromStringWithEncoding([self.field description], stringEncoding), AFPercentEscapedQueryStringPairMemberFromStringWithEncoding([self.value description], stringEncoding)];
-    }
-}
-
-@end
-
-#pragma mark -
-
-extern NSArray * AFQueryStringPairsFromDictionary(NSDictionary *dictionary);
-extern NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value);
-
-NSString * AFQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSStringEncoding stringEncoding) {
-    NSMutableArray *mutablePairs = [NSMutableArray array];
-    for (AFQueryStringPair *pair in AFQueryStringPairsFromDictionary(parameters)) {
-        [mutablePairs addObject:[pair URLEncodedStringValueWithEncoding:stringEncoding]];
-    }
-
-    return [mutablePairs componentsJoinedByString:@"&"];
-}
-
-NSArray * AFQueryStringPairsFromDictionary(NSDictionary *dictionary) {
-    return AFQueryStringPairsFromKeyAndValue(nil, dictionary);
-}
-
-NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
-    NSMutableArray *mutableQueryStringComponents = [NSMutableArray array];
-
-    if ([value isKindOfClass:[NSDictionary class]]) {
-        NSDictionary *dictionary = value;
-        // Sort dictionary keys to ensure consistent ordering in query string, which is important when deserializing potentially ambiguous sequences, such as an array of dictionaries
-        NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"description" ascending:YES selector:@selector(caseInsensitiveCompare:)];
-        for (id nestedKey in [dictionary.allKeys sortedArrayUsingDescriptors:@[ sortDescriptor ]]) {
-            id nestedValue = [dictionary objectForKey:nestedKey];
-            if (nestedValue) {
-                [mutableQueryStringComponents addObjectsFromArray:AFQueryStringPairsFromKeyAndValue((key ? [NSString stringWithFormat:@"%@[%@]", key, nestedKey] : nestedKey), nestedValue)];
-            }
-        }
-    } else if ([value isKindOfClass:[NSArray class]]) {
-        NSArray *array = value;
-        for (id nestedValue in array) {
-            [mutableQueryStringComponents addObjectsFromArray:AFQueryStringPairsFromKeyAndValue([NSString stringWithFormat:@"%@[]", key], nestedValue)];
-        }
-    } else if ([value isKindOfClass:[NSSet class]]) {
-        NSSet *set = value;
-        for (id obj in set) {
-            [mutableQueryStringComponents addObjectsFromArray:AFQueryStringPairsFromKeyAndValue(key, obj)];
-        }
-    } else {
-        [mutableQueryStringComponents addObject:[[AFQueryStringPair alloc] initWithField:key value:value]];
-    }
-
-    return mutableQueryStringComponents;
-}
-
-@interface AFStreamingMultipartFormData : NSObject <AFMultipartFormData>
-- (id)initWithURLRequest:(NSMutableURLRequest *)urlRequest
-          stringEncoding:(NSStringEncoding)encoding;
-
-- (NSMutableURLRequest *)requestByFinalizingMultipartFormData;
-@end
-
-#pragma mark -
-
-@interface AFHTTPClient ()
-@property (readwrite, nonatomic, strong) NSURL *baseURL;
-@property (readwrite, nonatomic, strong) NSMutableArray *registeredHTTPOperationClassNames;
-@property (readwrite, nonatomic, strong) NSMutableDictionary *defaultHeaders;
-@property (readwrite, nonatomic, strong) NSURLCredential *defaultCredential;
-@property (readwrite, nonatomic, strong) NSOperationQueue *operationQueue;
-#ifdef _SYSTEMCONFIGURATION_H
-@property (readwrite, nonatomic, assign) AFNetworkReachabilityRef networkReachability;
-@property (readwrite, nonatomic, assign) AFNetworkReachabilityStatus networkReachabilityStatus;
-@property (readwrite, nonatomic, copy) AFNetworkReachabilityStatusBlock networkReachabilityStatusBlock;
-#endif
-
-#ifdef _SYSTEMCONFIGURATION_H
-- (void)startMonitoringNetworkReachability;
-- (void)stopMonitoringNetworkReachability;
-#endif
-@end
-
-@implementation AFHTTPClient
-@synthesize baseURL = _baseURL;
-@synthesize stringEncoding = _stringEncoding;
-@synthesize parameterEncoding = _parameterEncoding;
-@synthesize registeredHTTPOperationClassNames = _registeredHTTPOperationClassNames;
-@synthesize defaultHeaders = _defaultHeaders;
-@synthesize defaultCredential = _defaultCredential;
-@synthesize operationQueue = _operationQueue;
-#ifdef _SYSTEMCONFIGURATION_H
-@synthesize networkReachability = _networkReachability;
-@synthesize networkReachabilityStatus = _networkReachabilityStatus;
-@synthesize networkReachabilityStatusBlock = _networkReachabilityStatusBlock;
-#endif
-#ifdef _AFNETWORKING_PIN_SSL_CERTIFICATES_
-@synthesize defaultSSLPinningMode = _defaultSSLPinningMode;
-#endif
-@synthesize allowsInvalidSSLCertificate = _allowsInvalidSSLCertificate;
-
-+ (instancetype)clientWithBaseURL:(NSURL *)url {
-    return [[self alloc] initWithBaseURL:url];
-}
-
-- (id)init {
-    @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:[NSString stringWithFormat:@"%@ Failed to call designated initializer. Invoke `initWithBaseURL:` instead.", NSStringFromClass([self class])] userInfo:nil];
-}
-
-- (id)initWithBaseURL:(NSURL *)url {
-    NSParameterAssert(url);
-
-    self = [super init];
-    if (!self) {
-        return nil;
-    }
-
-    // Ensure terminal slash for baseURL path, so that NSURL +URLWithString:relativeToURL: works as expected
-    if ([[url path] length] > 0 && ![[url absoluteString] hasSuffix:@"/"]) {
-        url = [url URLByAppendingPathComponent:@""];
-    }
-
-    self.baseURL = url;
-
-    self.stringEncoding = NSUTF8StringEncoding;
-    self.parameterEncoding = AFFormURLParameterEncoding;
-
-    self.registeredHTTPOperationClassNames = [NSMutableArray array];
-
-	self.defaultHeaders = [NSMutableDictionary dictionary];
-
-    // Accept-Language HTTP Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
-    NSMutableArray *acceptLanguagesComponents = [NSMutableArray array];
-    [[NSLocale preferredLanguages] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        float q = 1.0f - (idx * 0.1f);
-        [acceptLanguagesComponents addObject:[NSString stringWithFormat:@"%@;q=%0.1g", obj, q]];
-        *stop = q <= 0.5f;
-    }];
-    [self setDefaultHeader:@"Accept-Language" value:[acceptLanguagesComponents componentsJoinedByString:@", "]];
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wgnu"
-#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
-    // User-Agent Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.43
-    [self setDefaultHeader:@"User-Agent" value:[NSString stringWithFormat:@"%@/%@ (%@; iOS %@; Scale/%0.2f)", [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleExecutableKey] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleIdentifierKey], (__bridge id)CFBundleGetValueForInfoDictionaryKey(CFBundleGetMainBundle(), kCFBundleVersionKey) ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleVersionKey], [[UIDevice currentDevice] model], [[UIDevice currentDevice] systemVersion], ([[UIScreen mainScreen] respondsToSelector:@selector(scale)] ? [[UIScreen mainScreen] scale] : 1.0f)]];
-#elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
-    [self setDefaultHeader:@"User-Agent" value:[NSString stringWithFormat:@"%@/%@ (Mac OS X %@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleExecutableKey] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleIdentifierKey], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleVersionKey], [[NSProcessInfo processInfo] operatingSystemVersionString]]];
-#endif
-#pragma clang diagnostic pop
-
-#ifdef _SYSTEMCONFIGURATION_H
-    self.networkReachabilityStatus = AFNetworkReachabilityStatusUnknown;
-    [self startMonitoringNetworkReachability];
-#endif
-
-    self.operationQueue = [[NSOperationQueue alloc] init];
-	[self.operationQueue setMaxConcurrentOperationCount:NSOperationQueueDefaultMaxConcurrentOperationCount];
-
-    // #ifdef included for backwards-compatibility
-#ifdef _AFNETWORKING_ALLOW_INVALID_SSL_CERTIFICATES_
-    self.allowsInvalidSSLCertificate = YES;
-#endif
-    
-    return self;
-}
-
-- (void)dealloc {
-#ifdef _SYSTEMCONFIGURATION_H
-    [self stopMonitoringNetworkReachability];
-#endif
-}
-
-- (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p, baseURL: %@, defaultHeaders: %@, registeredOperationClasses: %@, operationQueue: %@>", NSStringFromClass([self class]), self, [self.baseURL absoluteString], self.defaultHeaders, self.registeredHTTPOperationClassNames, self.operationQueue];
-}
-
-#pragma mark -
-
-#ifdef _SYSTEMCONFIGURATION_H
 static BOOL AFURLHostIsIPAddress(NSURL *url) {
     struct sockaddr_in sa_in;
     struct sockaddr_in6 sa_in6;
@@ -334,7 +85,7 @@ static void AFNetworkReachabilityCallback(SCNetworkReachabilityRef __unused targ
 
     dispatch_async(dispatch_get_main_queue(), ^{
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-        [notificationCenter postNotificationName:AFNetworkingReachabilityDidChangeNotification object:nil userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:status] forKey:AFNetworkingReachabilityNotificationStatusItem]];
+        [notificationCenter postNotificationName:AFNetworkingReachabilityDidChangeNotification object:nil userInfo:@{ AFNetworkingReachabilityNotificationStatusItem: @(status) }];
     });
 }
 
@@ -347,7 +98,82 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
         Block_release(info);
     }
 }
+#else
+typedef id AFNetworkReachabilityRef;
+#endif
 
+@interface AFStreamingMultipartFormData : NSObject <AFMultipartFormData>
+- (instancetype)initWithURLRequest:(NSMutableURLRequest *)urlRequest
+                    stringEncoding:(NSStringEncoding)encoding;
+
+- (NSMutableURLRequest *)requestByFinalizingMultipartFormData;
+@end
+
+#pragma mark -
+
+@interface AFHTTPClient ()
+@property (readwrite, nonatomic, strong) NSURL *baseURL;
+#ifdef _SYSTEMCONFIGURATION_H
+@property (readwrite, nonatomic, assign) AFNetworkReachabilityRef networkReachability;
+@property (readwrite, nonatomic, assign) AFNetworkReachabilityStatus networkReachabilityStatus;
+@property (readwrite, nonatomic, copy) AFNetworkReachabilityStatusBlock networkReachabilityStatusBlock;
+#endif
+
+#ifdef _SYSTEMCONFIGURATION_H
+- (void)startMonitoringNetworkReachability;
+- (void)stopMonitoringNetworkReachability;
+#endif
+@end
+
+@implementation AFHTTPClient
+
++ (instancetype)client {
+    return [[AFHTTPClient alloc] initWithBaseURL:nil];
+}
+
+- (instancetype)initWithBaseURL:(NSURL *)url {
+    return [self initWithBaseURL:url sessionConfiguration:nil];
+}
+
+- (instancetype)initWithBaseURL:(NSURL *)url
+           sessionConfiguration:(NSURLSessionConfiguration *)configuration
+{
+    self = [super initWithSessionConfiguration:configuration];
+    if (!self) {
+        return nil;
+    }
+
+    // Ensure terminal slash for baseURL path, so that NSURL +URLWithString:relativeToURL: works as expected
+    if ([[url path] length] > 0 && ![[url absoluteString] hasSuffix:@"/"]) {
+        url = [url URLByAppendingPathComponent:@""];
+    }
+
+    self.baseURL = url;
+
+    self.requestSerializer = [AFHTTPSerializer serializer];
+    self.responseSerializers = @[ [AFJSONSerializer serializer], [AFHTTPSerializer serializer] ];
+
+#ifdef _SYSTEMCONFIGURATION_H
+    self.networkReachabilityStatus = AFNetworkReachabilityStatusUnknown;
+    [self startMonitoringNetworkReachability];
+#endif
+
+    return self;
+}
+
+- (void)dealloc {
+#ifdef _SYSTEMCONFIGURATION_H
+    [self stopMonitoringNetworkReachability];
+#endif
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p, baseURL: %@, session: %@, operationQueue: %@>", NSStringFromClass([self class]), self, [self.baseURL absoluteString], self.session, self.operationQueue];
+}
+
+#pragma mark -
+
+#ifdef _SYSTEMCONFIGURATION_H
 - (void)startMonitoringNetworkReachability {
     [self stopMonitoringNetworkReachability];
 
@@ -377,8 +203,7 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
     SCNetworkReachabilityContext context = {0, (__bridge void *)callback, AFNetworkReachabilityRetainCallback, AFNetworkReachabilityReleaseCallback, NULL};
     SCNetworkReachabilitySetCallback(self.networkReachability, AFNetworkReachabilityCallback, &context);
 
-    /* Network reachability monitoring does not establish a baseline for IP addresses as it does for hostnames, so if the base URL host is an IP address, the initial reachability callback is manually triggered.
-     */
+    // Network reachability monitoring does not establish a baseline for IP addresses as it does for hostnames, so if the base URL host is an IP address, the initial reachability callback is manually triggered.
     if (AFURLHostIsIPAddress(self.baseURL)) {
         SCNetworkReachabilityFlags flags;
         SCNetworkReachabilityGetFlags(self.networkReachability, &flags);
@@ -407,48 +232,6 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 
 #pragma mark -
 
-- (BOOL)registerHTTPOperationClass:(Class)operationClass {
-    if (![operationClass isSubclassOfClass:[AFHTTPRequestOperation class]]) {
-        return NO;
-    }
-
-    NSString *className = NSStringFromClass(operationClass);
-    [self.registeredHTTPOperationClassNames removeObject:className];
-    [self.registeredHTTPOperationClassNames insertObject:className atIndex:0];
-
-    return YES;
-}
-
-- (void)unregisterHTTPOperationClass:(Class)operationClass {
-    NSString *className = NSStringFromClass(operationClass);
-    [self.registeredHTTPOperationClassNames removeObject:className];
-}
-
-#pragma mark -
-
-- (NSString *)defaultValueForHeader:(NSString *)header {
-	return [self.defaultHeaders valueForKey:header];
-}
-
-- (void)setDefaultHeader:(NSString *)header value:(NSString *)value {
-	[self.defaultHeaders setValue:value forKey:header];
-}
-
-- (void)setAuthorizationHeaderWithUsername:(NSString *)username password:(NSString *)password {
-	NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", username, password];
-    [self setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Basic %@", AFBase64EncodedStringFromString(basicAuthCredentials)]];
-}
-
-- (void)setAuthorizationHeaderWithToken:(NSString *)token {
-    [self setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Token token=\"%@\"", token]];
-}
-
-- (void)clearAuthorizationHeader {
-	[self.defaultHeaders removeObjectForKey:@"Authorization"];
-}
-
-#pragma mark -
-
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
                                       path:(NSString *)path
                                 parameters:(NSDictionary *)parameters
@@ -460,42 +243,13 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
     }
 
     NSURL *url = [NSURL URLWithString:path relativeToURL:self.baseURL];
-	NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
     [request setHTTPMethod:method];
-    [request setAllHTTPHeaderFields:self.defaultHeaders];
-
-    if (parameters) {
-        if ([method isEqualToString:@"GET"] || [method isEqualToString:@"HEAD"] || [method isEqualToString:@"DELETE"]) {
-            url = [NSURL URLWithString:[[url absoluteString] stringByAppendingFormat:[path rangeOfString:@"?"].location == NSNotFound ? @"?%@" : @"&%@", AFQueryStringFromParametersWithEncoding(parameters, self.stringEncoding)]];
-            [request setURL:url];
-        } else {
-            NSString *charset = (__bridge NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(self.stringEncoding));
-            NSError *error = nil;
-
-            switch (self.parameterEncoding) {
-                case AFFormURLParameterEncoding:;
-                    [request setValue:[NSString stringWithFormat:@"application/x-www-form-urlencoded; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
-                    [request setHTTPBody:[AFQueryStringFromParametersWithEncoding(parameters, self.stringEncoding) dataUsingEncoding:self.stringEncoding]];
-                    break;
-                case AFJSONParameterEncoding:;
-                    [request setValue:[NSString stringWithFormat:@"application/json; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wassign-enum"
-                    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error]];
-#pragma clang diagnostic pop
-                    break;
-                case AFPropertyListParameterEncoding:;
-                    [request setValue:[NSString stringWithFormat:@"application/x-plist; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
-                    [request setHTTPBody:[NSPropertyListSerialization dataWithPropertyList:parameters format:NSPropertyListXMLFormat_v1_0 options:0 error:&error]];
-                    break;
-            }
-
-            if (error) {
-                NSLog(@"%@ %@: %@", [self class], NSStringFromSelector(_cmd), error);
-            }
-        }
+    [request setAllHTTPHeaderFields:[self.session.configuration HTTPAdditionalHeaders]];
+    if (self.requestSerializer) {
+        request = [[self.requestSerializer requestBySerializingRequest:request withParameters:parameters error:nil] mutableCopy];
     }
-
+    
 	return request;
 }
 
@@ -509,24 +263,22 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 
     NSMutableURLRequest *request = [self requestWithMethod:method path:path parameters:nil];
 
-    __block AFStreamingMultipartFormData *formData = [[AFStreamingMultipartFormData alloc] initWithURLRequest:request stringEncoding:self.stringEncoding];
+    __block AFStreamingMultipartFormData *formData = [[AFStreamingMultipartFormData alloc] initWithURLRequest:request stringEncoding:NSUTF8StringEncoding];
 
-    if (parameters) {
-        for (AFQueryStringPair *pair in AFQueryStringPairsFromDictionary(parameters)) {
-            NSData *data = nil;
-            if ([pair.value isKindOfClass:[NSData class]]) {
-                data = pair.value;
-            } else if ([pair.value isEqual:[NSNull null]]) {
-                data = [NSData data];
-            } else {
-                data = [[pair.value description] dataUsingEncoding:self.stringEncoding];
-            }
-
-            if (data) {
-                [formData appendPartWithFormData:data name:[pair.field description]];
-            }
+    [parameters enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        NSData *data = nil;
+        if ([obj isKindOfClass:[NSData class]]) {
+            data = obj;
+        } else if ([obj isEqual:[NSNull null]]) {
+            data = [NSData data];
+        } else {
+            data = [[obj description] dataUsingEncoding:NSUTF8StringEncoding];
         }
-    }
+
+        if (data) {
+            [formData appendPartWithFormData:data name:[key description]];
+        }
+    }];
 
     if (block) {
         block(formData);
@@ -535,30 +287,33 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
     return [formData requestByFinalizingMultipartFormData];
 }
 
-- (AFHTTPRequestOperation *)HTTPRequestOperationWithRequest:(NSURLRequest *)urlRequest
-                                                    success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-                                                    failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
-{
-    AFHTTPRequestOperation *operation = nil;
-    
-    for (NSString *className in self.registeredHTTPOperationClassNames) {
-        Class operationClass = NSClassFromString(className);
-        if (operationClass && [operationClass canProcessRequest:urlRequest]) {
-            operation = [(AFHTTPRequestOperation *)[operationClass alloc] initWithRequest:urlRequest];
-            break;
+- (void)setRequestSerializer:(id <AFURLRequestSerialization>)requestSerializer {
+    NSParameterAssert(requestSerializer);
+
+    _requestSerializer = requestSerializer;
+}
+
+- (id <AFURLResponseSerialization>)serializerForResponse:(NSHTTPURLResponse *)response {
+    for (id <AFURLResponseSerialization> serializer in self.responseSerializers) {
+        if ([serializer canProcessResponse:response]) {
+            return serializer;
         }
     }
 
-    if (!operation) {
-        operation = [[AFHTTPRequestOperation alloc] initWithRequest:urlRequest];
-    }
+    return nil;
+}
+
+#pragma mark -
+
+- (AFHTTPRequestOperation *)HTTPRequestOperationWithRequest:(NSURLRequest *)request
+                                                    success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                                                    failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    operation.responseSerializers = self.responseSerializers;
 
     [operation setCompletionBlockWithSuccess:success failure:failure];
 
-    operation.credential = self.defaultCredential;
-#ifdef _AFNETWORKING_PIN_SSL_CERTIFICATES_
-    operation.SSLPinningMode = self.defaultSSLPinningMode;
-#endif
     operation.allowsInvalidSSLCertificate = self.allowsInvalidSSLCertificate;
 
     return operation;
@@ -592,12 +347,12 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
     }
 }
 
-- (void)enqueueBatchOfHTTPRequestOperationsWithRequests:(NSArray *)urlRequests
+- (void)enqueueBatchOfHTTPRequestOperationsWithRequests:(NSArray *)requests
                                           progressBlock:(void (^)(NSUInteger numberOfFinishedOperations, NSUInteger totalNumberOfOperations))progressBlock
                                         completionBlock:(void (^)(NSArray *operations))completionBlock
 {
     NSMutableArray *mutableOperations = [NSMutableArray array];
-    for (NSURLRequest *request in urlRequests) {
+    for (NSURLRequest *request in requests) {
         AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:nil failure:nil];
         [mutableOperations addObject:operation];
     }
@@ -609,28 +364,26 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
                               progressBlock:(void (^)(NSUInteger numberOfFinishedOperations, NSUInteger totalNumberOfOperations))progressBlock
                             completionBlock:(void (^)(NSArray *operations))completionBlock
 {
-    __block dispatch_group_t dispatchGroup = dispatch_group_create();
+    __block dispatch_group_t group = dispatch_group_create();
     NSBlockOperation *batchedOperation = [NSBlockOperation blockOperationWithBlock:^{
-        dispatch_group_notify(dispatchGroup, dispatch_get_main_queue(), ^{
+        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
             if (completionBlock) {
                 completionBlock(operations);
             }
         });
-#if !OS_OBJECT_USE_OBJC
-        dispatch_release(dispatchGroup);
-#endif
     }];
 
     for (AFHTTPRequestOperation *operation in operations) {
-        AFCompletionBlock originalCompletionBlock = [operation.completionBlock copy];
+        operation.completionGroup = group;
+        void (^originalCompletionBlock)(void) = [operation.completionBlock copy];
         __weak __typeof(&*operation)weakOperation = operation;
         operation.completionBlock = ^{
             __strong __typeof(&*weakOperation)strongOperation = weakOperation;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu"
-            dispatch_queue_t queue = strongOperation.successCallbackQueue ?: dispatch_get_main_queue();
+            dispatch_queue_t queue = strongOperation.completionQueue ?: dispatch_get_main_queue();
 #pragma clang diagnostic pop
-            dispatch_group_async(dispatchGroup, queue, ^{
+            dispatch_group_async(group, queue, ^{
                 if (originalCompletionBlock) {
                     originalCompletionBlock();
                 }
@@ -643,11 +396,11 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
                     progressBlock(numberOfFinishedOperations, [operations count]);
                 }
 
-                dispatch_group_leave(dispatchGroup);
+                dispatch_group_leave(group);
             });
         };
 
-        dispatch_group_enter(dispatchGroup);
+        dispatch_group_enter(group);
         [batchedOperation addDependency:operation];
     }
     [self.operationQueue addOperations:operations waitUntilFinished:NO];
@@ -656,94 +409,360 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 
 #pragma mark -
 
-- (void)getPath:(NSString *)path
-     parameters:(NSDictionary *)parameters
-        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+- (NSURLSessionDataTask *)GET:(NSString *)URLString
+                   parameters:(NSDictionary *)parameters
+                      success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                      failure:(void (^)(NSError *error))failure
 {
-	NSURLRequest *request = [self requestWithMethod:@"GET" path:path parameters:parameters];
-    AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
-    [self enqueueHTTPRequestOperation:operation];
+    NSMutableURLRequest *request = [self requestWithMethod:@"GET" path:URLString parameters:parameters];
+
+    return [self runDataTaskWithRequest:request success:^(NSHTTPURLResponse *response, id <AFURLResponseSerialization> __unused serializer, id responseObject) {
+        if (success) {
+            success(response, responseObject);
+        }
+    } failure:^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
 }
 
-- (void)postPath:(NSString *)path
-      parameters:(NSDictionary *)parameters
-         success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+- (NSURLSessionDataTask *)HEAD:(NSString *)URLString
+                    parameters:(NSDictionary *)parameters
+                       success:(void (^)(NSHTTPURLResponse *response))success
+                       failure:(void (^)(NSError *error))failure
 {
-	NSURLRequest *request = [self requestWithMethod:@"POST" path:path parameters:parameters];
-	AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
-    [self enqueueHTTPRequestOperation:operation];
+    NSMutableURLRequest *request = [self requestWithMethod:@"HEAD" path:URLString parameters:parameters];
+
+    return [self runDataTaskWithRequest:request success:^(NSHTTPURLResponse *response, id <AFURLResponseSerialization> __unused serializer, id __unused responseObject) {
+        if (success) {
+            success(response);
+        }
+    } failure:^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
 }
 
-- (void)putPath:(NSString *)path
-     parameters:(NSDictionary *)parameters
-        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+- (NSURLSessionDataTask *)POST:(NSString *)URLString
+                    parameters:(NSDictionary *)parameters
+                       success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                       failure:(void (^)(NSError *error))failure
 {
-	NSURLRequest *request = [self requestWithMethod:@"PUT" path:path parameters:parameters];
-	AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
-    [self enqueueHTTPRequestOperation:operation];
+    NSMutableURLRequest *request = [self requestWithMethod:@"POST" path:URLString parameters:parameters];
+
+    return [self runDataTaskWithRequest:request success:^(NSHTTPURLResponse *response, id <AFURLResponseSerialization> __unused serializer, id responseObject) {
+        if (success) {
+            success(response, responseObject);
+        }
+    } failure:^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
 }
 
-- (void)deletePath:(NSString *)path
-        parameters:(NSDictionary *)parameters
-           success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-           failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+- (NSURLSessionDataTask *)POST:(NSString *)URLString
+                    parameters:(NSDictionary *)parameters
+     constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
+                       success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                       failure:(void (^)(NSError *error))failure
 {
-	NSURLRequest *request = [self requestWithMethod:@"DELETE" path:path parameters:parameters];
-	AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
-    [self enqueueHTTPRequestOperation:operation];
+    NSMutableURLRequest *request = [self multipartFormRequestWithMethod:@"POST" path:URLString parameters:parameters constructingBodyWithBlock:block];
+
+    return [self runDataTaskWithRequest:request success:^(NSHTTPURLResponse *response, id <AFURLResponseSerialization> __unused serializer, id responseObject) {
+        if (success) {
+            success(response, responseObject);
+        }
+    } failure:^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
 }
 
-- (void)patchPath:(NSString *)path
-       parameters:(NSDictionary *)parameters
-          success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-          failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+- (NSURLSessionDataTask *)PUT:(NSString *)URLString
+                   parameters:(NSDictionary *)parameters
+                      success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                      failure:(void (^)(NSError *error))failure
 {
-    NSURLRequest *request = [self requestWithMethod:@"PATCH" path:path parameters:parameters];
-	AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
-    [self enqueueHTTPRequestOperation:operation];
+    NSMutableURLRequest *request = [self requestWithMethod:@"PUT" path:URLString parameters:parameters];
+
+    return [self runDataTaskWithRequest:request success:^(NSHTTPURLResponse *response, id <AFURLResponseSerialization> __unused serializer, id responseObject) {
+        if (success) {
+            success(response, responseObject);
+        }
+    } failure:^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
+}
+
+- (NSURLSessionDataTask *)PATCH:(NSString *)URLString
+                     parameters:(NSDictionary *)parameters
+                        success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                        failure:(void (^)(NSError *error))failure
+{
+    NSMutableURLRequest *request = [self requestWithMethod:@"PATCH" path:URLString parameters:parameters];
+
+    return [self runDataTaskWithRequest:request success:^(NSHTTPURLResponse *response, id <AFURLResponseSerialization> __unused serializer, id responseObject) {
+        if (success) {
+            success(response, responseObject);
+        }
+    } failure:^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
+}
+
+- (NSURLSessionDataTask *)DELETE:(NSString *)URLString
+                      parameters:(NSDictionary *)parameters
+                         success:(void (^)(NSHTTPURLResponse *response, id responseObject))success
+                         failure:(void (^)(NSError *error))failure
+{
+    NSMutableURLRequest *request = [self requestWithMethod:@"DELETE" path:URLString parameters:parameters];
+
+    return [self runDataTaskWithRequest:request success:^(NSHTTPURLResponse *response, id <AFURLResponseSerialization> __unused serializer, id responseObject) {
+        if (success) {
+            success(response, responseObject);
+        }
+    } failure:^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
+}
+
+#pragma mark -
+
+- (NSURLSessionDataTask *)runDataTaskWithRequest:(NSURLRequest *)request
+                                         success:(void (^)(NSHTTPURLResponse *response, id <AFURLResponseSerialization> serializer, id responseObject))success
+                                         failure:(void (^)(NSError *error))failure
+{
+    NSURLSessionDataTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            if (failure) {
+                failure(error);
+            }
+        } else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                id <AFURLResponseSerialization> serializer = [self serializerForResponse:(NSHTTPURLResponse *)response];
+                NSError *serializationError = nil;
+                id responseObject = [serializer responseObjectForResponse:(NSHTTPURLResponse *)response data:data error:&serializationError];
+
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    if (serializationError) {
+                        if (failure) {
+                            failure(serializationError);
+                        }
+                    } else {
+                        if (success) {
+                            success((NSHTTPURLResponse *)response, serializer, responseObject);
+                        }
+                    }
+                });
+            });
+        }
+    }];
+
+    [task resume];
+
+    return task;
+}
+
+#pragma mark -
+
+- (NSURLSessionUploadTask *)runUploadTaskWithRequest:(NSURLRequest *)request
+                                            fromFile:(NSURL *)fileURL
+                                            progress:(void (^)(uint32_t bytesWritten, uint32_t totalBytesWritten, uint32_t totalBytesExpectedToWrite))progress
+                                             success:(void (^)(NSHTTPURLResponse *response, id <AFURLResponseSerialization> serializer, id responseObject))success
+                                             failure:(void (^)(NSError *error))failure
+{
+    NSURLSessionUploadTask *task = [self.session uploadTaskWithRequest:request fromFile:fileURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            if (failure) {
+                failure(error);
+            }
+        } else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                id <AFURLResponseSerialization> serializer = [self serializerForResponse:(NSHTTPURLResponse *)response];
+                NSError *serializationError = nil;
+                id responseObject = [serializer responseObjectForResponse:(NSHTTPURLResponse *)response data:data error:&serializationError];
+
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    if (serializationError) {
+                        if (failure) {
+                            failure(serializationError);
+                        }
+                    } else {
+                        if (success) {
+                            success((NSHTTPURLResponse *)response, serializer, responseObject);
+                        }
+                    }
+                });
+            });
+        }
+    }];
+
+    if (progress) {
+        [self setUploadProgressForTask:task usingBlock:progress];
+    }
+    
+    [task resume];
+
+    return task;
+}
+
+- (NSURLSessionUploadTask *)runUploadTaskWithRequest:(NSURLRequest *)request
+                                            fromData:(NSData *)bodyData
+                                            progress:(void (^)(uint32_t bytesWritten, uint32_t totalBytesWritten, uint32_t totalBytesExpectedToWrite))progress
+                                             success:(void (^)(NSHTTPURLResponse *response, id <AFURLResponseSerialization> serializer, id responseObject))success
+                                             failure:(void (^)(NSError *error))failure
+{
+    NSURLSessionUploadTask *task = [self.session uploadTaskWithRequest:request fromData:bodyData completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            if (failure) {
+                failure(error);
+            }
+        } else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                id <AFURLResponseSerialization> serializer = [self serializerForResponse:(NSHTTPURLResponse *)response];
+                NSError *serializationError = nil;
+                id responseObject = [serializer responseObjectForResponse:(NSHTTPURLResponse *)response data:data error:&serializationError];
+
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    if (serializationError) {
+                        if (failure) {
+                            failure(serializationError);
+                        }
+                    } else {
+                        if (success) {
+                            success((NSHTTPURLResponse *)response, serializer, responseObject);
+                        }
+                    }
+                });
+            });
+        }
+    }];
+
+    if (progress) {
+        [self setUploadProgressForTask:task usingBlock:progress];
+    }
+
+    [task resume];
+    
+    return task;
+}
+
+#pragma mark -
+
+- (NSURLSessionDownloadTask *)runDownloadTaskWithRequest:(NSURLRequest *)request
+                                                progress:(void (^)(uint32_t bytesRead, uint32_t totalBytesRead, uint32_t totalBytesExpectedToRead))progress
+                                                 success:(NSURL * (^)(NSHTTPURLResponse *response))success
+                                                 failure:(void (^)(NSError *error))failure
+{
+    NSURLSessionDownloadTask *task = [self.session downloadTaskWithRequest:request completionHandler:^(NSURL *targetPath, NSURLResponse *response, NSError *error) {
+        if (error) {
+            if (failure) {
+                failure(error);
+            }
+        } else {
+            if (success) {
+                NSURL *destinationPath = success((NSHTTPURLResponse *)response);
+
+                NSError *fileManagerError = nil;
+                [[NSFileManager defaultManager] moveItemAtURL:targetPath toURL:destinationPath error:&fileManagerError];
+                if (fileManagerError && failure) {
+                    failure(fileManagerError);
+                }
+            }
+        }
+    }];
+
+    if (progress) {
+        [self setDownloadProgressForTask:task usingBlock:progress];
+    }
+
+    [task resume];
+
+    return task;
+}
+
+- (NSURLSessionDownloadTask *)runDownloadTaskWithResumeData:(NSData *)resumeData
+                                                   progress:(void (^)(uint32_t bytesRead, uint32_t totalBytesRead, uint32_t totalBytesExpectedToRead))progress
+                                                    success:(NSURL * (^)(NSHTTPURLResponse *response))success
+                                                    failure:(void (^)(NSError *error))failure
+{
+    NSURLSessionDownloadTask *task = [self.session downloadTaskWithResumeData:resumeData completionHandler:^(NSURL *targetPath, NSURLResponse *response, NSError *error) {
+        if (error) {
+            if (failure) {
+                failure(error);
+            }
+        } else {
+            if (success) {
+                NSURL *destinationPath = success((NSHTTPURLResponse *)response);
+
+                NSError *fileManagerError = nil;
+                [[NSFileManager defaultManager] moveItemAtURL:targetPath toURL:destinationPath error:&fileManagerError];
+                if (fileManagerError && failure) {
+                    failure(fileManagerError);
+                }
+            }
+        }
+    }];
+
+    if (progress) {
+        [self setDownloadProgressForTask:task usingBlock:progress];
+    }
+
+    [task resume];
+
+    return task;
 }
 
 #pragma mark - NSCoding
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     NSURL *baseURL = [aDecoder decodeObjectForKey:@"baseURL"];
+    NSURLSessionConfiguration *configuration = [aDecoder decodeObjectForKey:@"sessionConfiguration"];
 
-    self = [self initWithBaseURL:baseURL];
+    self = [self initWithBaseURL:baseURL sessionConfiguration:configuration];
     if (!self) {
         return nil;
     }
 
-    self.stringEncoding = [aDecoder decodeIntegerForKey:@"stringEncoding"];
-    self.parameterEncoding = (AFHTTPClientParameterEncoding) [aDecoder decodeIntegerForKey:@"parameterEncoding"];
-    self.registeredHTTPOperationClassNames = [aDecoder decodeObjectForKey:@"registeredHTTPOperationClassNames"];
-    self.defaultHeaders = [aDecoder decodeObjectForKey:@"defaultHeaders"];
+    self.requestSerializer = [aDecoder decodeObjectForKey:@"requestSerializer"];
+    self.responseSerializers = [aDecoder decodeObjectForKey:@"responseSerializers"];
+    self.SSLPinningMode = [aDecoder decodeIntegerForKey:@"SSLPinningMode"];
+    self.allowsInvalidSSLCertificate = [aDecoder decodeBoolForKey:@"allowsInvalidSSLCertificate"];
 
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+
     [aCoder encodeObject:self.baseURL forKey:@"baseURL"];
-    [aCoder encodeInteger:(NSInteger)self.stringEncoding forKey:@"stringEncoding"];
-    [aCoder encodeInteger:self.parameterEncoding forKey:@"parameterEncoding"];
-    [aCoder encodeObject:self.registeredHTTPOperationClassNames forKey:@"registeredHTTPOperationClassNames"];
-    [aCoder encodeObject:self.defaultHeaders forKey:@"defaultHeaders"];
+    [aCoder encodeObject:self.requestSerializer forKey:@"requestSerializer"];
+    [aCoder encodeObject:self.responseSerializers forKey:@"responseSerializers"];
+    [aCoder encodeInteger:self.SSLPinningMode forKey:@"SSLPinningMode"];
+    [aCoder encodeBool:self.allowsInvalidSSLCertificate forKey:@"allowsInvalidSSLCertificate"];
 }
 
 #pragma mark - NSCopying
 
 - (id)copyWithZone:(NSZone *)zone {
-    AFHTTPClient *HTTPClient = [[[self class] allocWithZone:zone] initWithBaseURL:self.baseURL];
+    AFHTTPClient *HTTPClient = [[[self class] allocWithZone:zone] initWithBaseURL:self.baseURL sessionConfiguration:self.session.configuration];
 
-    HTTPClient.stringEncoding = self.stringEncoding;
-    HTTPClient.parameterEncoding = self.parameterEncoding;
-    HTTPClient.registeredHTTPOperationClassNames = [self.registeredHTTPOperationClassNames copyWithZone:zone];
-    HTTPClient.defaultHeaders = [self.defaultHeaders copyWithZone:zone];
-#ifdef _SYSTEMCONFIGURATION_H
+    HTTPClient.requestSerializer = [self.requestSerializer copyWithZone:zone];
+    HTTPClient.responseSerializers = [self.responseSerializers copy];
+    HTTPClient.SSLPinningMode = self.SSLPinningMode;
+    HTTPClient.allowsInvalidSSLCertificate = self.allowsInvalidSSLCertificate;
     HTTPClient.networkReachabilityStatusBlock = self.networkReachabilityStatusBlock;
-#endif
+    
     return HTTPClient;
 }
 
@@ -755,7 +774,7 @@ static NSString * const kAFMultipartFormBoundary = @"Boundary+0xAbCdEfGbOuNdArY"
 
 static NSString * const kAFMultipartFormCRLF = @"\r\n";
 
-static NSInteger const kAFStreamToStreamBufferSize = 1024 * 1024; //1 meg default
+static NSInteger const kAFStreamToStreamBufferSize = 1024 * 1024;
 
 static inline NSString * AFMultipartFormInitialBoundary() {
     return [NSString stringWithFormat:@"--%@%@", kAFMultipartFormBoundary, kAFMultipartFormCRLF];
@@ -790,14 +809,14 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 @property (nonatomic, assign) NSStringEncoding stringEncoding;
 @property (nonatomic, strong) NSDictionary *headers;
 @property (nonatomic, strong) id body;
-@property (nonatomic, assign) unsigned long long bodyContentLength;
+@property (nonatomic, assign) int64_t bodyContentLength;
 @property (nonatomic, strong) NSInputStream *inputStream;
 
 @property (nonatomic, assign) BOOL hasInitialBoundary;
 @property (nonatomic, assign) BOOL hasFinalBoundary;
 
 @property (nonatomic, readonly, getter = hasBytesAvailable) BOOL bytesAvailable;
-@property (nonatomic, readonly) unsigned long long contentLength;
+@property (nonatomic, readonly) int64_t contentLength;
 
 - (NSInteger)read:(uint8_t *)buffer
         maxLength:(NSUInteger)length;
@@ -807,7 +826,7 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 @property (nonatomic, assign) NSUInteger numberOfBytesInPacket;
 @property (nonatomic, assign) NSTimeInterval delay;
 @property (nonatomic, strong) NSInputStream *inputStream;
-@property (nonatomic, readonly) unsigned long long contentLength;
+@property (nonatomic, readonly) int64_t contentLength;
 @property (nonatomic, readonly, getter = isEmpty) BOOL empty;
 
 - (id)initWithStringEncoding:(NSStringEncoding)encoding;
@@ -824,9 +843,6 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 @end
 
 @implementation AFStreamingMultipartFormData
-@synthesize request = _request;
-@synthesize bodyStream = _bodyStream;
-@synthesize stringEncoding = _stringEncoding;
 
 - (id)initWithURLRequest:(NSMutableURLRequest *)urlRequest
           stringEncoding:(NSStringEncoding)encoding
@@ -868,14 +884,14 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
     NSParameterAssert(mimeType);
 
     if (![fileURL isFileURL]) {
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:NSLocalizedStringFromTable(@"Expected URL to be a file URL", @"AFNetworking", nil) forKey:NSLocalizedFailureReasonErrorKey];
+        NSDictionary *userInfo = @{ NSLocalizedFailureReasonErrorKey: NSLocalizedStringFromTable(@"Expected URL to be a file URL", @"AFNetworking", nil) };
         if (error != NULL) {
             *error = [[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorBadURL userInfo:userInfo];
         }
 
         return NO;
     } else if ([fileURL checkResourceIsReachableAndReturnError:error] == NO) {
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:NSLocalizedStringFromTable(@"File URL not reachable.", @"AFNetworking", nil) forKey:NSLocalizedFailureReasonErrorKey];
+        NSDictionary *userInfo = @{ NSLocalizedFailureReasonErrorKey: NSLocalizedStringFromTable(@"File URL not reachable.", @"AFNetworking", nil) };
         if (error != NULL) {
             *error = [[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorBadURL userInfo:userInfo];
         }
@@ -904,7 +920,7 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 - (void)appendPartWithInputStream:(NSInputStream *)inputStream
                              name:(NSString *)name
                          fileName:(NSString *)fileName
-                           length:(unsigned long long)length
+                           length:(int64_t)length
                          mimeType:(NSString *)mimeType
 {
     NSParameterAssert(name);
@@ -1005,17 +1021,6 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 @end
 
 @implementation AFMultipartBodyStream
-@synthesize streamStatus = _streamStatus;
-@synthesize streamError = _streamError;
-@synthesize stringEncoding = _stringEncoding;
-@synthesize HTTPBodyParts = _HTTPBodyParts;
-@synthesize HTTPBodyPartEnumerator = _HTTPBodyPartEnumerator;
-@synthesize currentHTTPBodyPart = _currentHTTPBodyPart;
-@synthesize inputStream = _inputStream;
-@synthesize outputStream = _outputStream;
-@synthesize buffer = _buffer;
-@synthesize numberOfBytesInPacket = _numberOfBytesInPacket;
-@synthesize delay = _delay;
 
 - (id)initWithStringEncoding:(NSStringEncoding)encoding {
     self = [super init];
@@ -1120,8 +1125,8 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
                   forMode:(__unused NSString *)mode
 {}
 
-- (unsigned long long)contentLength {
-    unsigned long long length = 0;
+- (int64_t)contentLength {
+    int64_t length = 0;
     for (AFHTTPBodyPart *bodyPart in self.HTTPBodyParts) {
         length += [bodyPart contentLength];
     }
@@ -1147,7 +1152,7 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 
 #pragma mark - NSCopying
 
--(id)copyWithZone:(NSZone *)zone {
+- (id)copyWithZone:(NSZone *)zone {
     AFMultipartBodyStream *bodyStreamCopy = [[[self class] allocWithZone:zone] initWithStringEncoding:self.stringEncoding];
 
     for (AFHTTPBodyPart *bodyPart in self.HTTPBodyParts) {
@@ -1163,17 +1168,17 @@ NSTimeInterval const kAFUploadStream3GSuggestedDelay = 0.2;
 
 #pragma mark -
 
-typedef enum {
+typedef NS_ENUM(NSUInteger, AFHTTPBodyPartReadPhase) {
     AFEncapsulationBoundaryPhase = 1,
     AFHeaderPhase                = 2,
     AFBodyPhase                  = 3,
     AFFinalBoundaryPhase         = 4,
-} AFHTTPBodyPartReadPhase;
+};
 
 @interface AFHTTPBodyPart () <NSCopying> {
     AFHTTPBodyPartReadPhase _phase;
     NSInputStream *_inputStream;
-    unsigned long long _phaseReadOffset;
+    int64_t _phaseReadOffset;
 }
 
 - (BOOL)transitionToNextPhase;
@@ -1183,15 +1188,8 @@ typedef enum {
 @end
 
 @implementation AFHTTPBodyPart
-@synthesize stringEncoding = _stringEncoding;
-@synthesize headers = _headers;
-@synthesize body = _body;
-@synthesize bodyContentLength = _bodyContentLength;
-@synthesize inputStream = _inputStream;
-@synthesize hasInitialBoundary = _hasInitialBoundary;
-@synthesize hasFinalBoundary = _hasFinalBoundary;
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
     if (!self) {
         return nil;
@@ -1233,8 +1231,8 @@ typedef enum {
     return [NSString stringWithString:headerString];
 }
 
-- (unsigned long long)contentLength {
-    unsigned long long length = 0;
+- (int64_t)contentLength {
+    int64_t length = 0;
 
     NSData *encapsulationBoundaryData = [([self hasInitialBoundary] ? AFMultipartFormInitialBoundary() : AFMultipartFormEncapsulationBoundary()) dataUsingEncoding:self.stringEncoding];
     length += [encapsulationBoundaryData length];

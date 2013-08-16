@@ -1,6 +1,6 @@
 // AFPropertyListRequestOperation.h
 //
-// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+// Copyright (c) 2013 AFNetworking (http://afnetworking.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,12 @@
 /**
  An object deserialized from a plist constructed using the response data.
  */
-@property (readonly, nonatomic) id responsePropertyList;
+@property (readonly, nonatomic, strong) id responsePropertyList;
+
+/**
+ 
+ */
+@property (readonly, nonatomic, assign) NSPropertyListFormat responsePropertyListFormat;
 
 ///--------------------------------------
 /// @name Managing Property List Behavior
