@@ -28,7 +28,7 @@
                   usingBlock:(void (^)(NSArray *operations, NSError *error))block
                        error:(NSError * __autoreleasing *)error
 {
-    NSMutableURLRequest *request = [self requestWithMethod:@"SUBSCRIBE" path:URLString parameters:nil];
+    NSMutableURLRequest *request = [self requestWithMethod:@"SUBSCRIBE" URLString:URLString parameters:nil];
     [request setValue:@"text/event-stream" forHTTPHeaderField:@"Accept"];
 
     return [self openEventSourceWithRequest:request serializer:[AFJSONPatchSerializer serializer] usingBlock:block error:error];
@@ -40,7 +40,7 @@
                                         error:(NSError * __autoreleasing *)error
 {
     AFEventSource *eventSource = [[AFEventSource alloc] initWithRequest:request];
-    [eventSource addEventListener:@"patch" usingBlock:^(AFServerSentEvent *event) {
+    [eventSource addListenerForEvent:@"patch" usingBlock:^(AFServerSentEvent *event) {
         NSError *serializationError = nil;
         NSArray *operations = [serializer responseObjectForResponse:nil data:event.data error:&serializationError];
         if (block) {

@@ -34,8 +34,8 @@
     static AFHTTPClient *_af_sharedHTTPClient = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _af_sharedHTTPClient = [[AFHTTPClient alloc] initWithSessionConfiguration:nil]; // TODO allow anonymous HTTP clients
-        _af_sharedHTTPClient.responseSerializers = @[[AFImageSerializer serializer]];
+        _af_sharedHTTPClient = [[AFHTTPClient alloc] init];
+        _af_sharedHTTPClient.responseSerializer = [AFImageSerializer serializer];
     });
 
     return _af_sharedHTTPClient;
@@ -104,12 +104,11 @@
                   success:(void (^)(NSHTTPURLResponse *response, UIImage *image))success
                   failure:(void (^)(NSError *error))failure
 {
-    
     [self setValue:placeholderImage forKeyPath:keyPath];
 
-    [[[self class] af_sharedHTTPClient] runDataTaskWithRequest:urlRequest success:^(NSHTTPURLResponse *response, id <AFURLResponseSerialization> __unused serializer, id responseObject) {
+    NSURLSessionTask *task = [[[self class] af_sharedHTTPClient] dataTaskWithRequest:urlRequest success:^(NSURLResponse *response, id responseObject) {
         if (success) {
-            success(response, responseObject);
+            success((NSHTTPURLResponse *)response, responseObject);
         } else if (responseObject) {
             [self setValue:responseObject forKeyPath:keyPath];
         }
@@ -118,6 +117,8 @@
             failure(error);
         }
     }];
+
+    [task resume];
 }
 
 - (void)cancelImageDataTasks {

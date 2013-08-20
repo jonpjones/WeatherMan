@@ -21,12 +21,14 @@
 // THE SOFTWARE.
 
 #import "AFEventSource.h"
+#import "AFHTTPRequestOperation.h"
 
 typedef void (^AFServerSentEventBlock)(AFServerSentEvent *event);
 
 NSString * const AFEventSourceErrorDomain = @"com.alamofire.networking.event-source.error";
 
 static NSString * const AFEventSourceLockName = @"com.alamofire.networking.event-source.lock";
+static NSUInteger const AFEventSourceListenersCapacity = 100;
 
 static NSDictionary * AFServerSentEventFieldsFromData(NSData *data, NSError * __autoreleasing *error) {
     if (!data || [data length] == 0) {
@@ -37,7 +39,8 @@ static NSDictionary * AFServerSentEventFieldsFromData(NSData *data, NSError * __
     NSMutableDictionary *mutableFields = [NSMutableDictionary dictionary];
 
     for (NSString *line in [string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
-        if (!line || [line length] == 0) {
+        // Ignore nil or blank lines, as well as lines beginning with a colon
+        if (!line || [line length] == 0 || [line hasPrefix:@":"]) {
             continue;
         }
 
@@ -83,6 +86,41 @@ static NSDictionary * AFServerSentEventFieldsFromData(NSData *data, NSError * __
     return event;
 }
 
+#pragma mark - NSCoding
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [self init];
+    if (!self) {
+        return nil;
+    }
+
+    self.event = [aDecoder decodeObjectForKey:@"event"];
+    self.identifier = [aDecoder decodeObjectForKey:@"identifier"];
+    self.data = [aDecoder decodeObjectForKey:@"data"];
+    self.retry = [aDecoder decodeIntegerForKey:@"retry"];
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:self.event forKey:@"event"];
+    [aCoder encodeObject:self.identifier forKey:@"identifier"];
+    [aCoder encodeObject:self.data forKey:@"data"];
+    [aCoder encodeInteger:self.retry forKey:@"retry"];
+}
+
+#pragma mark - NSCopying
+
+- (id)copyWithZone:(NSZone *)zone {
+    AFServerSentEvent *event = [[[self class] allocWithZone:zone] init];
+    event.event = self.event;
+    event.identifier = self.identifier;
+    event.data = self.data;
+    event.retry = self.retry;
+
+    return event;
+}
+
 @end
 
 #pragma mark -
@@ -122,7 +160,7 @@ typedef NS_ENUM(NSUInteger, AFEventSourceState) {
 
     self.request = request;
 
-    self.listenersKeyedByEvent = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsCopyIn valueOptions:NSPointerFunctionsStrongMemory capacity:100];
+    self.listenersKeyedByEvent = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsCopyIn valueOptions:NSPointerFunctionsStrongMemory capacity:AFEventSourceListenersCapacity];
 
     self.lock = [[NSRecursiveLock alloc] init];
     self.lock.name = AFEventSourceLockName;
@@ -167,7 +205,7 @@ typedef NS_ENUM(NSUInteger, AFEventSourceState) {
     self.state = AFEventSourceConnecting;
 
     self.requestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:self.request];
-    self.requestOperation.responseSerializers = @[ [AFServerSentEventSerializer serializer] ];
+    self.requestOperation.responseSerializer = [AFServerSentEventSerializer serializer];
     self.outputStream = [NSOutputStream outputStreamToMemory];
     self.outputStream.delegate = self;
     self.requestOperation.outputStream = self.outputStream;
@@ -207,20 +245,36 @@ typedef NS_ENUM(NSUInteger, AFEventSourceState) {
 
 #pragma mark -
 
-- (void)addEventListener:(NSString *)event
-              usingBlock:(void (^)(AFServerSentEvent *event))block
+- (NSUInteger)addListenerForEvent:(NSString *)event
+                       usingBlock:(void (^)(AFServerSentEvent *event))block
 {
-    NSMutableArray *mutableListeners = [self.listenersKeyedByEvent objectForKey:event];
-    if (!mutableListeners) {
-        mutableListeners = [NSMutableArray array];
+    NSMutableDictionary *mutableListenersKeyedByIdentifier = [self.listenersKeyedByEvent objectForKey:event];
+    if (!mutableListenersKeyedByIdentifier) {
+        mutableListenersKeyedByIdentifier = [NSMutableDictionary dictionary];
     }
 
-    [mutableListeners addObject:[block copy]];
+    NSUInteger identifier = [[NSUUID UUID] hash];
+    mutableListenersKeyedByIdentifier[@(identifier)] = [block copy];
     
-    [self.listenersKeyedByEvent setObject:mutableListeners forKey:event];
+    [self.listenersKeyedByEvent setObject:mutableListenersKeyedByIdentifier forKey:event];
+
+    return identifier;
 }
 
-- (void)removeListenersForEvent:(NSString *)event {
+- (void)removeEventListenerWithIdentifier:(NSUInteger)identifier {
+    NSEnumerator *enumerator = [self.listenersKeyedByEvent keyEnumerator];
+    id event = nil;
+    while ((event = [enumerator nextObject])) {
+        NSMutableDictionary *mutableListenersKeyedByIdentifier = [self.listenersKeyedByEvent objectForKey:event];
+        if ([mutableListenersKeyedByIdentifier objectForKey:@(identifier)]) {
+            [mutableListenersKeyedByIdentifier removeObjectForKey:@(identifier)];
+            [self.listenersKeyedByEvent setObject:mutableListenersKeyedByIdentifier forKey:event];
+            return;
+        }
+    }
+}
+
+- (void)removeAllListenersForEvent:(NSString *)event {
     [self.listenersKeyedByEvent removeObjectForKey:event];
 }
 
@@ -256,6 +310,29 @@ typedef NS_ENUM(NSUInteger, AFEventSourceState) {
         default:
             break;
     }
+}
+
+#pragma mark - NSCoding
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    NSURLRequest *request = [aDecoder decodeObjectForKey:@"request"];
+
+    self = [self initWithRequest:request];
+    if (!self) {
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:self.request forKey:@"request"];
+}
+
+#pragma mark - NSCopying
+
+- (id)copyWithZone:(NSZone *)zone {
+    return [[[self class] allocWithZone:zone] initWithRequest:self.request];
 }
 
 @end

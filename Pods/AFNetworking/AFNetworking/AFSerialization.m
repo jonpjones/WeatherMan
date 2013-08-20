@@ -28,6 +28,8 @@
 #import <Cocoa/Cocoa.h>
 #endif
 
+#import "AFHTTPRequestOperation.h"
+
 typedef NSString * (^AFQueryStringSerializationBlock)(NSURLRequest *request, NSDictionary *parameters, NSError *__autoreleasing *error);
 
 static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
@@ -123,6 +125,8 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
         return nil;
     }
 
+    self.stringEncoding = NSUTF8StringEncoding;
+
     self.mutableHTTPRequestHeaders = [NSMutableDictionary dictionary];
 
     // Accept-Language HTTP Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
@@ -134,15 +138,24 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     }];
     [self setValue:[acceptLanguagesComponents componentsJoinedByString:@", "] forHTTPHeaderField:@"Accept-Language"];
 
+    NSString *userAgent = nil;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu"
 #if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
     // User-Agent Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.43
-    [self setValue:[NSString stringWithFormat:@"%@/%@ (%@; iOS %@; Scale/%0.2f)", [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleExecutableKey] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleIdentifierKey], (__bridge id)CFBundleGetValueForInfoDictionaryKey(CFBundleGetMainBundle(), kCFBundleVersionKey) ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleVersionKey], [[UIDevice currentDevice] model], [[UIDevice currentDevice] systemVersion], ([[UIScreen mainScreen] respondsToSelector:@selector(scale)] ? [[UIScreen mainScreen] scale] : 1.0f)] forHTTPHeaderField:@"User-Agent"];
+    userAgent = [NSString stringWithFormat:@"%@/%@ (%@; iOS %@; Scale/%0.2f)", [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleExecutableKey] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleIdentifierKey], (__bridge id)CFBundleGetValueForInfoDictionaryKey(CFBundleGetMainBundle(), kCFBundleVersionKey) ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleVersionKey], [[UIDevice currentDevice] model], [[UIDevice currentDevice] systemVersion], ([[UIScreen mainScreen] respondsToSelector:@selector(scale)] ? [[UIScreen mainScreen] scale] : 1.0f)];
 #elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
-    [self setValue:[NSString stringWithFormat:@"%@/%@ (Mac OS X %@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleExecutableKey] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleIdentifierKey], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleVersionKey], [[NSProcessInfo processInfo] operatingSystemVersionString]] forHTTPHeaderField:@"User-Agent"];
+    userAgent = [NSString stringWithFormat:@"%@/%@ (Mac OS X %@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleExecutableKey] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleIdentifierKey], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:(__bridge NSString *)kCFBundleVersionKey], [[NSProcessInfo processInfo] operatingSystemVersionString]];
 #endif
 #pragma clang diagnostic pop
+    if (userAgent) {
+        if (![userAgent canBeConvertedToEncoding:NSASCIIStringEncoding]) {
+            NSMutableString *mutableUserAgent = [userAgent mutableCopy];
+            CFStringTransform((__bridge CFMutableStringRef)(mutableUserAgent), NULL, kCFStringTransformToLatin, false);
+            userAgent = mutableUserAgent;
+        }
+        [self setValue:userAgent forHTTPHeaderField:@"User-Agent"];
+    }
 
     self.acceptableStatusCodes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(200, 100)];
     self.acceptableContentTypes = nil;
@@ -226,7 +239,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     return YES;
 }
 
-#pragma mark - AFURLRequestSerializer
+#pragma mark - AFURLRequestSerialization
 
 - (NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request
                                withParameters:(NSDictionary *)parameters
@@ -273,11 +286,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     return mutableRequest;
 }
 
-#pragma mark - AFURLResponseSerializer
-
-- (BOOL)canProcessResponse:(NSHTTPURLResponse *)response {
-    return !self.acceptableContentTypes || [self.acceptableContentTypes containsObject:response.MIMEType];
-}
+#pragma mark - AFURLResponseSerialization
 
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
@@ -365,6 +374,10 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
 
     NSMutableURLRequest *mutableRequest = [request mutableCopy];
 
+    [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL *stop) {
+        [mutableRequest setValue:value forHTTPHeaderField:field];
+    }];
+
     NSString *charset = (__bridge NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
 
     [mutableRequest setValue:[NSString stringWithFormat:@"application/json; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
@@ -377,10 +390,6 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
 }
 
 #pragma mark - AFURLRequestSerialization
-
-- (BOOL)canProcessResponse:(NSHTTPURLResponse *)response {
-    return [[[response URL] pathExtension] isEqualToString:@"json"] || [super canProcessResponse:response];
-}
 
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
@@ -467,11 +476,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     return self;
 }
 
-#pragma mark AFHTTPResponseSerializer
-
-- (BOOL)canProcessResponse:(NSHTTPURLResponse *)response {
-    return [[[response URL] pathExtension] isEqualToString:@"xml"] || [super canProcessResponse:response];
-}
+#pragma mark - AFURLResponseSerialization
 
 - (id)responseObjectForResponse:(NSHTTPURLResponse *)response
                            data:(NSData *)data
@@ -510,11 +515,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     return self;
 }
 
-#pragma mark AFHTTPResponseSerializer
-
-- (BOOL)canProcessResponse:(NSHTTPURLResponse *)response {
-    return [[[response URL] pathExtension] isEqualToString:@"xml"] || [super canProcessResponse:response];
-}
+#pragma mark - AFURLResponseSerialization
 
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
@@ -614,6 +615,10 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
 
     NSMutableURLRequest *mutableRequest = [request mutableCopy];
 
+    [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL *stop) {
+        [mutableRequest setValue:value forHTTPHeaderField:field];
+    }];
+
     NSString *charset = (__bridge NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
 
     [mutableRequest setValue:[NSString stringWithFormat:@"application/x-plist; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
@@ -622,11 +627,7 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     return mutableRequest;
 }
 
-#pragma mark - AFURLResponseSerializer
-
-- (BOOL)canProcessResponse:(NSHTTPURLResponse *)response {
-    return [[[response URL] pathExtension] isEqualToString:@"plist"] || [super canProcessResponse:response];
-}
+#pragma mark - AFURLResponseSerialization
 
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
@@ -771,17 +772,6 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
 
 @implementation AFImageSerializer
 
-+ (instancetype)serializer {
-    AFImageSerializer *serializer = [[self alloc] init];
-
-#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
-    serializer.imageScale = [[UIScreen mainScreen] scale];
-    serializer.automaticallyInflatesResponseImage = YES;
-#endif
-    
-    return serializer;
-}
-
 - (instancetype)init {
     self = [super init];
     if (!self) {
@@ -789,6 +779,11 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
     }
 
     self.acceptableContentTypes = [[NSSet alloc] initWithObjects:@"image/tiff", @"image/jpeg", @"image/gif", @"image/png", @"image/ico", @"image/x-icon", @"image/bmp", @"image/x-bmp", @"image/x-xbitmap", @"image/x-win-bitmap", nil];
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+    self.imageScale = [[UIScreen mainScreen] scale];
+    self.automaticallyInflatesResponseImage = YES;
+#endif
 
     return self;
 }
@@ -804,10 +799,6 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
 }
 
 #pragma mark -
-
-- (BOOL)canProcessResponse:(NSHTTPURLResponse *)response {
-    return [[[self class] acceptablePathExtensions] containsObject:[[response URL] pathExtension]] || [super canProcessResponse:response];
-}
 
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
@@ -872,5 +863,42 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
     
     return serializer;
 }
+
+@end
+
+#pragma mark -
+
+@interface AFCompoundSerializer ()
+@property (readwrite, nonatomic, strong) NSArray *responseSerializers;
+@end
+
+@implementation AFCompoundSerializer
+
++ (instancetype)compoundSerializerWithResponseSerializers:(NSArray *)responseSerializers {
+    AFCompoundSerializer *serializer = [[self alloc] init];
+    serializer.responseSerializers = responseSerializers;
+
+    return serializer;
+}
+
+#pragma mark - AFURLResponseSerialization
+
+- (id)responseObjectForResponse:(NSURLResponse *)response
+                           data:(NSData *)data
+                          error:(NSError *__autoreleasing *)error
+{
+    for (id serializer in self.responseSerializers) {
+        if (![serializer isKindOfClass:[AFHTTPSerializer class]]) {
+            continue;
+        }
+
+        if ([(AFHTTPSerializer *)serializer validateResponse:(NSHTTPURLResponse *)response data:data error:nil]) {
+            return [serializer responseObjectForResponse:response data:data error:error];
+        }
+    }
+
+    return [super responseObjectForResponse:response data:data error:error];
+}
+
 
 @end

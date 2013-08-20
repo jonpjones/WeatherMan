@@ -25,7 +25,6 @@
 #import "AFSerialization.h"
 
 @interface AFPropertyListRequestOperation ()
-@property (readwrite, nonatomic, strong) AFPropertyListSerializer *propertyListSerializer;
 @property (readwrite, nonatomic, strong) id responsePropertyList;
 @property (readwrite, nonatomic, assign) NSPropertyListFormat responsePropertyListFormat;
 @property (readwrite, nonatomic, strong) NSError *error;
@@ -60,7 +59,7 @@
         return nil;
     }
 
-    self.propertyListSerializer = [AFPropertyListSerializer serializerWithFormat:NSPropertyListXMLFormat_v1_0 readOptions:NSPropertyListImmutable writeOptions:0];
+    self.responseSerializer = [AFPropertyListSerializer serializerWithFormat:NSPropertyListXMLFormat_v1_0 readOptions:NSPropertyListImmutable writeOptions:0];
 
     return self;
 }
@@ -68,13 +67,13 @@
 #pragma mark AFPropertyListRequestOperation
 
 - (NSPropertyListReadOptions)propertyListReadOptions {
-    return self.propertyListSerializer.readOptions;
+    return [(AFPropertyListSerializer *)self.responseSerializer readOptions];
 }
 
 - (void)setPropertyListReadOptions:(NSPropertyListReadOptions)propertyListReadOptions {
     [self.lock lock];
     if (self.propertyListReadOptions != propertyListReadOptions) {
-        self.propertyListSerializer.readOptions = propertyListReadOptions;
+        [(AFPropertyListSerializer *)self.responseSerializer setReadOptions:propertyListReadOptions];
 
         self.responsePropertyList = nil;
     }
@@ -106,9 +105,17 @@
         if (![responseObject isKindOfClass:[NSData class]]) {
             [strongSelf setResponsePropertyList:responseObject];
         }
+
+        if (success) {
+            success(operation, responseObject);
+        }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         __strong __typeof(weakSelf)strongSelf = weakSelf;
         [strongSelf setError:error];
+
+        if (failure) {
+            failure(operation, error);
+        }
     }];
 }
 

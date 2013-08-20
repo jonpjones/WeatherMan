@@ -47,7 +47,7 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
         return nil;
     }
         
-    self.responseSerializers = @[[AFJSONSerializer serializer]];
+    self.responseSerializer = [AFJSONSerializer serializer];
     
     return self;
 }

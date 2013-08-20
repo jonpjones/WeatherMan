@@ -1,14 +1,14 @@
 PODS:
-  - AFNetworking (2.0.0-RC1):
+  - AFNetworking (2.0.0-RC2):
     - AFNetworking/Core
     - AFNetworking/UIKit+AFNetworking
-  - AFNetworking/Core (2.0.0-RC1)
-  - AFNetworking/UIKit+AFNetworking (2.0.0-RC1)
+  - AFNetworking/Core (2.0.0-RC2)
+  - AFNetworking/UIKit+AFNetworking (2.0.0-RC2)
 
 DEPENDENCIES:
   - AFNetworking
 
 SPEC CHECKSUMS:
-  AFNetworking: 29456fb87c4a62a5ae1d27baf6771a2cf327089f
+  AFNetworking: 6b4bff71172dc36dd93b035c1cb52dd97d7ce428
 
 COCOAPODS: 0.20.2
