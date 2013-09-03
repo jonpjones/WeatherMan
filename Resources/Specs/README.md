@@ -22,9 +22,10 @@
 ### Cells
 * The cells should be 80 points by 80 points
 * The weather icon should be 40 points by 40 points and centered in the cell
-* The time and temperature should both be Subheadlines
+* The time and temperature in the should both be of type Subheadlines
 * The high temperature for the day for the dataset should be the warm gradient and all elements should be white
 * The low temperature for the day for the dataset should be the cool gradient and all elements should be white
+* Fetching the cell weather icon should use the provided category on `NSURLRequest`
 
 ### Error View
 * The umbrella image should be horizontally centered. It should be offset 10 points high from the vertical center
