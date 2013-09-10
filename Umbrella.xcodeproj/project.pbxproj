@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		445B84E617271B140072E66C /* UMBMainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 445B84E517271B140072E66C /* UMBMainViewController.xib */; };
+		448D696F17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m in Sources */ = {isa = PBXBuildFile; fileRef = 448D696C17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m */; };
+		448D697017DF7D5500C6EB65 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 448D696E17DF7D5500C6EB65 /* UIImage+ImageEffects.m */; };
+		448D697217DF7D7800C6EB65 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 448D697117DF7D7800C6EB65 /* Accelerate.framework */; };
 		585688AD160131D600AD5C9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688AC160131D600AD5C9D /* UIKit.framework */; };
 		585688AF160131D600AD5C9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688AE160131D600AD5C9D /* Foundation.framework */; };
 		585688B1160131D600AD5C9D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688B0160131D600AD5C9D /* CoreGraphics.framework */; };
@@ -21,6 +24,11 @@
 
 /* Begin PBXFileReference section */
 		445B84E517271B140072E66C /* UMBMainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UMBMainViewController.xib; sourceTree = "<group>"; };
+		448D696B17DF7D5500C6EB65 /* NSURLRequest+Umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+Umbrella.h"; sourceTree = "<group>"; };
+		448D696C17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+Umbrella.m"; sourceTree = "<group>"; };
+		448D696D17DF7D5500C6EB65 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
+		448D696E17DF7D5500C6EB65 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
+		448D697117DF7D7800C6EB65 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		585688A8160131D600AD5C9D /* Umbrella.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Umbrella.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		585688AC160131D600AD5C9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		585688AE160131D600AD5C9D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -44,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				448D697217DF7D7800C6EB65 /* Accelerate.framework in Frameworks */,
 				585688AD160131D600AD5C9D /* UIKit.framework in Frameworks */,
 				585688AF160131D600AD5C9D /* Foundation.framework in Frameworks */,
 				585688B1160131D600AD5C9D /* CoreGraphics.framework in Frameworks */,
@@ -54,6 +63,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		448D696A17DF7D5500C6EB65 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				448D696B17DF7D5500C6EB65 /* NSURLRequest+Umbrella.h */,
+				448D696C17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m */,
+				448D696D17DF7D5500C6EB65 /* UIImage+ImageEffects.h */,
+				448D696E17DF7D5500C6EB65 /* UIImage+ImageEffects.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
 		5856889D160131D600AD5C9D = {
 			isa = PBXGroup;
 			children = (
@@ -75,6 +95,7 @@
 		585688AB160131D600AD5C9D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				448D697117DF7D7800C6EB65 /* Accelerate.framework */,
 				585688AC160131D600AD5C9D /* UIKit.framework */,
 				585688AE160131D600AD5C9D /* Foundation.framework */,
 				585688B0160131D600AD5C9D /* CoreGraphics.framework */,
@@ -86,6 +107,7 @@
 		585688B2160131D600AD5C9D /* Umbrella */ = {
 			isa = PBXGroup;
 			children = (
+				448D696A17DF7D5500C6EB65 /* Categories */,
 				588A8A4D1603C089002350AF /* ViewControllers */,
 				588A8A551603C092002350AF /* ThirdParty */,
 				585688BB160131D600AD5C9D /* UMBAppDelegate.h */,
@@ -217,8 +239,10 @@
 			files = (
 				585688B9160131D600AD5C9D /* main.m in Sources */,
 				585688BD160131D600AD5C9D /* UMBAppDelegate.m in Sources */,
+				448D697017DF7D5500C6EB65 /* UIImage+ImageEffects.m in Sources */,
 				588A8A531603C089002350AF /* UMBMainViewController.m in Sources */,
 				588A8A591603C092002350AF /* WeatherAPIClient.m in Sources */,
+				448D696F17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,7 +315,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Umbrella/Umbrella-Prefix.pch";
 				INFOPLIST_FILE = "Umbrella/Umbrella-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 				WARNING_CFLAGS = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -304,7 +330,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Umbrella/Umbrella-Prefix.pch";
 				INFOPLIST_FILE = "Umbrella/Umbrella-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 				WARNING_CFLAGS = "";
 				WRAPPER_EXTENSION = app;
 			};
