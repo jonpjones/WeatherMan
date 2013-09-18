@@ -6,8 +6,6 @@
 //  Copyright (c) 2013 {{YOUR_NAME_HERE}}. All rights reserved.
 //
 
-#import "UMBFlipsideViewController.h"
-
-@interface UMBMainViewController : UIViewController <UMBFlipsideViewControllerDelegate>
+@interface UMBMainViewController : UIViewController
 
 @end

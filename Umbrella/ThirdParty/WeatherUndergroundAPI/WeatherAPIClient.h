@@ -23,7 +23,7 @@ extern NSInteger const kWeatherAPIClientErrorCodeNoAPIKey;
 /**
  This class will call out to the Weather Client and fetch the appropriate data
  */
-@interface WeatherAPIClient : AFHTTPClient
+@interface WeatherAPIClient : AFHTTPSessionManager
 
 /**
  Required for making calls to the weather underground API.
@@ -43,7 +43,8 @@ extern NSInteger const kWeatherAPIClientErrorCodeNoAPIKey;
  Gets the gets the forcast and conditions from the Weather Underground API and calls the completion block on success/failure. Must be called on main thread.
  @param zipCode the 5 digit zip code of the location to retrieve the weather
  @param completionBlock The completion block to be executed when the request has completed. The completion block will be called on the main thread.
+ @return The task that was created for fetching the weather
  */
-- (void)getForcastAndConditionsForZipCode:(NSString *)zipCode withCompletionBlock:(WeatherAPICompletionBlock)completionBlock;
+- (NSURLSessionDataTask *)getForecastAndConditionsForZipCode:(NSString *)zipCode withCompletionBlock:(WeatherAPICompletionBlock)completionBlock;
 
 @end
