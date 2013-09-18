@@ -1,17 +1,17 @@
-// AFNetworking.h
+// AFSecurity.h
 //
-// Copyright (c) 2013 AFNetworking (http://afnetworking.com/)
-// 
+// Copyright (c) 2013 AFNetworking (http://afnetworking.com)
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,20 +21,54 @@
 // THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-#import <Availability.h>
+#import <Security/Security.h>
 
-#ifndef _AFNETWORKING_
-    #define _AFNETWORKING_
+/**
+ 
+ */
+typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
+    AFSSLPinningModeNone,
+    AFSSLPinningModePublicKey,
+    AFSSLPinningModeCertificate,
+};
 
-    #import "AFURLRequestSerialization.h"
-    #import "AFURLResponseSerialization.h"
-    #import "AFSecurityPolicy.h"
-    #import "AFNetworkReachabilityManager.h"
+/**
+ 
+ */
+@interface AFSecurityPolicy : NSObject
 
-    #import "AFURLConnectionOperation.h"
-    #import "AFHTTPRequestOperation.h"
-    #import "AFHTTPRequestOperationManager.h"
+/**
+ 
+ */
+@property (nonatomic, assign) AFSSLPinningMode SSLPinningMode;
 
-    #import "AFURLSessionManager.h"
-    #import "AFHTTPSessionManager.h"
-#endif /* _AFNETWORKING_ */
+/**
+ 
+ */
+@property (nonatomic, strong) NSArray *pinnedCertificates;
+
+/**
+ 
+ */
+@property (nonatomic, assign) BOOL allowInvalidCertificates;
+
+///
+
+/**
+ 
+ */
++ (instancetype)defaultPolicy;
+
+/**
+ 
+ */
++ (instancetype)debugPolicy;
+
+///
+
+/**
+ 
+ */
+- (BOOL)evaluateServerTrust:(SecTrustRef)serverTrust;
+
+@end

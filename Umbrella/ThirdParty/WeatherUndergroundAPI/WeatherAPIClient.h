@@ -23,7 +23,7 @@ extern NSInteger const kWeatherAPIClientErrorCodeNoAPIKey;
 /**
  This class will call out to the Weather Client and fetch the appropriate data
  */
-@interface WeatherAPIClient : AFHTTPClient
+@interface WeatherAPIClient : AFHTTPSessionManager
 
 /**
  Required for making calls to the weather underground API.

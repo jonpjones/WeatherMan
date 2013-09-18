@@ -34,22 +34,10 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
     static WeatherAPIClient *_sharedClient = nil;
     static dispatch_once_t oncePredicate;
     dispatch_once(&oncePredicate, ^{
-        _sharedClient = [[self alloc] initWithBaseURL:[NSURL URLWithString:kWeatherAPIBaseURLString]];
+        _sharedClient = [[WeatherAPIClient alloc] initWithBaseURL:[NSURL URLWithString:kWeatherAPIBaseURLString]];
     });
     
     return _sharedClient;
-}
-
-- (id)initWithBaseURL:(NSURL *)url
-{
-    self = [super initWithBaseURL:url];
-    if (!self) {
-        return nil;
-    }
-        
-    self.responseSerializer = [AFJSONSerializer serializer];
-    
-    return self;
 }
 
 #pragma mark - API calls
@@ -75,21 +63,19 @@ NSInteger const kWeatherAPIClientErrorCodeNoAPIKey = 1001;
     __weak __typeof(self)weakSelf = self;
     
     // Start the request
-    NSURLSessionDataTask *task = [self GET:pathString parameters:nil success:^(NSHTTPURLResponse *response, id responseObject) {
+    
+    return [self GET:pathString parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         // Check the responseObject
         if (!responseObject || ![responseObject isKindOfClass:[NSDictionary class]] || [responseObject count] == 0) {
             DLog(@"Invalid responseObject: %@", responseObject);
             completionBlock(NO, nil, [weakSelf genericError]);
             return;
         }
-        
         completionBlock(YES, responseObject, nil);
-    } failure:^(NSError *error) {
-        NSLog(@"Error with getForcastForLocation response: %@", error);
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        DLog(@"Error with getForcastForLocation response: %@", error);
         completionBlock(NO, nil, error);
     }];
-    
-    return task;
 }
 
 #pragma mark - Errors
