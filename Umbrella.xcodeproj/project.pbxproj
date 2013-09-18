@@ -7,23 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		445B84E417271B060072E66C /* UMBFlipsideViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 445B84E317271B060072E66C /* UMBFlipsideViewController.xib */; };
 		445B84E617271B140072E66C /* UMBMainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 445B84E517271B140072E66C /* UMBMainViewController.xib */; };
+		448D696F17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m in Sources */ = {isa = PBXBuildFile; fileRef = 448D696C17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m */; };
+		448D697017DF7D5500C6EB65 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 448D696E17DF7D5500C6EB65 /* UIImage+ImageEffects.m */; };
+		448D697217DF7D7800C6EB65 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 448D697117DF7D7800C6EB65 /* Accelerate.framework */; };
 		585688AD160131D600AD5C9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688AC160131D600AD5C9D /* UIKit.framework */; };
 		585688AF160131D600AD5C9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688AE160131D600AD5C9D /* Foundation.framework */; };
 		585688B1160131D600AD5C9D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688B0160131D600AD5C9D /* CoreGraphics.framework */; };
 		585688B7160131D600AD5C9D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 585688B5160131D600AD5C9D /* InfoPlist.strings */; };
 		585688B9160131D600AD5C9D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 585688B8160131D600AD5C9D /* main.m */; };
 		585688BD160131D600AD5C9D /* UMBAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 585688BC160131D600AD5C9D /* UMBAppDelegate.m */; };
-		588A8A521603C089002350AF /* UMBFlipsideViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 588A8A4F1603C089002350AF /* UMBFlipsideViewController.m */; };
 		588A8A531603C089002350AF /* UMBMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 588A8A511603C089002350AF /* UMBMainViewController.m */; };
 		588A8A591603C092002350AF /* WeatherAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 588A8A581603C092002350AF /* WeatherAPIClient.m */; };
 		E5A345C7EBAC49E790C9337A /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C37B9BB51D4B41438758A4B9 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		445B84E317271B060072E66C /* UMBFlipsideViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UMBFlipsideViewController.xib; sourceTree = "<group>"; };
 		445B84E517271B140072E66C /* UMBMainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UMBMainViewController.xib; sourceTree = "<group>"; };
+		448D696B17DF7D5500C6EB65 /* NSURLRequest+Umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+Umbrella.h"; sourceTree = "<group>"; };
+		448D696C17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+Umbrella.m"; sourceTree = "<group>"; };
+		448D696D17DF7D5500C6EB65 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
+		448D696E17DF7D5500C6EB65 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
+		448D697117DF7D7800C6EB65 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		585688A8160131D600AD5C9D /* Umbrella.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Umbrella.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		585688AC160131D600AD5C9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		585688AE160131D600AD5C9D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -34,8 +39,6 @@
 		585688BA160131D600AD5C9D /* Umbrella-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Umbrella-Prefix.pch"; sourceTree = "<group>"; };
 		585688BB160131D600AD5C9D /* UMBAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UMBAppDelegate.h; sourceTree = "<group>"; };
 		585688BC160131D600AD5C9D /* UMBAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UMBAppDelegate.m; sourceTree = "<group>"; };
-		588A8A4E1603C089002350AF /* UMBFlipsideViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UMBFlipsideViewController.h; sourceTree = "<group>"; };
-		588A8A4F1603C089002350AF /* UMBFlipsideViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UMBFlipsideViewController.m; sourceTree = "<group>"; };
 		588A8A501603C089002350AF /* UMBMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UMBMainViewController.h; sourceTree = "<group>"; };
 		588A8A511603C089002350AF /* UMBMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UMBMainViewController.m; sourceTree = "<group>"; };
 		588A8A571603C092002350AF /* WeatherAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeatherAPIClient.h; sourceTree = "<group>"; };
@@ -49,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				448D697217DF7D7800C6EB65 /* Accelerate.framework in Frameworks */,
 				585688AD160131D600AD5C9D /* UIKit.framework in Frameworks */,
 				585688AF160131D600AD5C9D /* Foundation.framework in Frameworks */,
 				585688B1160131D600AD5C9D /* CoreGraphics.framework in Frameworks */,
@@ -59,6 +63,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		448D696A17DF7D5500C6EB65 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				448D696B17DF7D5500C6EB65 /* NSURLRequest+Umbrella.h */,
+				448D696C17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m */,
+				448D696D17DF7D5500C6EB65 /* UIImage+ImageEffects.h */,
+				448D696E17DF7D5500C6EB65 /* UIImage+ImageEffects.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
 		5856889D160131D600AD5C9D = {
 			isa = PBXGroup;
 			children = (
@@ -80,6 +95,7 @@
 		585688AB160131D600AD5C9D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				448D697117DF7D7800C6EB65 /* Accelerate.framework */,
 				585688AC160131D600AD5C9D /* UIKit.framework */,
 				585688AE160131D600AD5C9D /* Foundation.framework */,
 				585688B0160131D600AD5C9D /* CoreGraphics.framework */,
@@ -91,6 +107,7 @@
 		585688B2160131D600AD5C9D /* Umbrella */ = {
 			isa = PBXGroup;
 			children = (
+				448D696A17DF7D5500C6EB65 /* Categories */,
 				588A8A4D1603C089002350AF /* ViewControllers */,
 				588A8A551603C092002350AF /* ThirdParty */,
 				585688BB160131D600AD5C9D /* UMBAppDelegate.h */,
@@ -114,9 +131,6 @@
 		588A8A4D1603C089002350AF /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				588A8A4E1603C089002350AF /* UMBFlipsideViewController.h */,
-				588A8A4F1603C089002350AF /* UMBFlipsideViewController.m */,
-				445B84E317271B060072E66C /* UMBFlipsideViewController.xib */,
 				588A8A501603C089002350AF /* UMBMainViewController.h */,
 				588A8A511603C089002350AF /* UMBMainViewController.m */,
 				445B84E517271B140072E66C /* UMBMainViewController.xib */,
@@ -169,7 +183,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = UMB;
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Umbrella Corp.";
 			};
 			buildConfigurationList = 585688A2160131D600AD5C9D /* Build configuration list for PBXProject "Umbrella" */;
@@ -195,7 +209,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				585688B7160131D600AD5C9D /* InfoPlist.strings in Resources */,
-				445B84E417271B060072E66C /* UMBFlipsideViewController.xib in Resources */,
 				445B84E617271B140072E66C /* UMBMainViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -226,9 +239,10 @@
 			files = (
 				585688B9160131D600AD5C9D /* main.m in Sources */,
 				585688BD160131D600AD5C9D /* UMBAppDelegate.m in Sources */,
-				588A8A521603C089002350AF /* UMBFlipsideViewController.m in Sources */,
+				448D697017DF7D5500C6EB65 /* UIImage+ImageEffects.m in Sources */,
 				588A8A531603C089002350AF /* UMBMainViewController.m in Sources */,
 				588A8A591603C092002350AF /* WeatherAPIClient.m in Sources */,
+				448D696F17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +282,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -300,7 +315,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Umbrella/Umbrella-Prefix.pch";
 				INFOPLIST_FILE = "Umbrella/Umbrella-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 				WARNING_CFLAGS = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -313,7 +330,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Umbrella/Umbrella-Prefix.pch";
 				INFOPLIST_FILE = "Umbrella/Umbrella-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 				WARNING_CFLAGS = "";
 				WRAPPER_EXTENSION = app;
 			};

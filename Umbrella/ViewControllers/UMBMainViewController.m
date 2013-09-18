@@ -10,13 +10,6 @@
 
 @interface UMBMainViewController ()
 
-/*!
- @method showSettings:
- @abstract On tap, shows the settings (flipside) screen
- @param sender The button that was tapped
- */
-- (IBAction)showSettings:(id)sender;
-
 @end
 
 @implementation UMBMainViewController
@@ -30,21 +23,6 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - Flipside View
-
-- (IBAction)showSettings:(id)sender
-{
-    UMBFlipsideViewController *controller = [[UMBFlipsideViewController alloc] initWithNibName:@"UMBFlipsideViewController" bundle:nil];
-    controller.delegate = self;
-    controller.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-    [self presentViewController:controller animated:(sender) ? YES : NO completion:nil];
-}
-
-- (void)flipsideViewControllerDidFinish:(UMBFlipsideViewController *)controller
-{
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end
