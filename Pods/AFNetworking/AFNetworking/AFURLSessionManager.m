@@ -22,6 +22,8 @@
 
 #import "AFURLSessionManager.h"
 
+#if (defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= 70000) || (defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1090)
+
 static dispatch_queue_t url_session_manager_processing_queue() {
     static dispatch_queue_t af_url_session_manager_processing_queue;
     static dispatch_once_t onceToken;
@@ -70,6 +72,7 @@ typedef NSURLSessionResponseDisposition (^AFURLSessionDataTaskDidReceiveResponse
 typedef void (^AFURLSessionDataTaskDidBecomeDownloadTaskBlock)(NSURLSession *session, NSURLSessionDataTask *dataTask, NSURLSessionDownloadTask *downloadTask);
 typedef void (^AFURLSessionDataTaskDidReceiveDataBlock)(NSURLSession *session, NSURLSessionDataTask *dataTask, NSData *data);
 typedef NSCachedURLResponse * (^AFURLSessionDataTaskWillCacheResponseBlock)(NSURLSession *session, NSURLSessionDataTask *dataTask, NSCachedURLResponse *proposedResponse);
+typedef void (^AFURLSessionDidFinishEventsForBackgroundURLSessionBlock)(NSURLSession *session);
 
 typedef NSURL * (^AFURLSessionDownloadTaskDidFinishDownloadingBlock)(NSURLSession *session, NSURLSessionDownloadTask *downloadTask, NSURL *location);
 typedef void (^AFURLSessionDownloadTaskDidWriteDataBlock)(NSURLSession *session, NSURLSessionDownloadTask *downloadTask, int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite);
@@ -84,6 +87,7 @@ typedef void (^AFURLSessionTaskCompletionHandler)(NSURLResponse *response, id re
 @property (nonatomic, strong) NSMutableData *mutableData;
 @property (nonatomic, strong) NSProgress *uploadProgress;
 @property (nonatomic, strong) NSProgress *downloadProgress;
+@property (nonatomic, copy) NSURL *downloadFileURL;
 @property (nonatomic, copy) AFURLSessionDownloadTaskDidFinishDownloadingBlock downloadTaskDidFinishDownloading;
 @property (nonatomic, copy) AFURLSessionTaskCompletionHandler completionHandler;
 
@@ -117,9 +121,9 @@ typedef void (^AFURLSessionTaskCompletionHandler)(NSURLResponse *response, id re
 
 #pragma mark - NSURLSessionTaskDelegate
 
-- (void)URLSession:(NSURLSession *)session
-              task:(NSURLSessionTask *)task
-   didSendBodyData:(int64_t)bytesSent
+- (void)URLSession:(__unused NSURLSession *)session
+              task:(__unused NSURLSessionTask *)task
+   didSendBodyData:(__unused int64_t)bytesSent
     totalBytesSent:(int64_t)totalBytesSent
 totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
 {
@@ -127,23 +131,32 @@ totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
     self.uploadProgress.totalUnitCount = totalBytesExpectedToSend;
 }
 
-- (void)URLSession:(NSURLSession *)session
+- (void)URLSession:(__unused NSURLSession *)session
               task:(NSURLSessionTask *)task
 didCompleteWithError:(NSError *)error
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu"
     if (self.completionHandler) {
+        __strong AFURLSessionManager *manager = self.manager;
+
+        __block id responseObject = nil;
+
         __block NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-        userInfo[AFNetworkingTaskDidFinishResponseSerializerKey] = self.manager.responseSerializer;
-        if (self.mutableData) {
+        userInfo[AFNetworkingTaskDidFinishResponseSerializerKey] = manager.responseSerializer;
+
+        if (self.downloadFileURL) {
+            userInfo[AFNetworkingTaskDidFinishAssetPathKey] = self.downloadFileURL;
+        } else if (self.mutableData) {
             userInfo[AFNetworkingTaskDidFinishResponseDataKey] = [NSData dataWithData:self.mutableData];
         }
 
         if (error) {
             userInfo[AFNetworkingTaskDidFinishErrorKey] = error;
 
-            dispatch_group_async(self.manager.completionGroup ?: url_session_manager_completion_group(), self.manager.completionQueue ?: dispatch_get_main_queue(), ^{
+            dispatch_group_async(manager.completionGroup ?: url_session_manager_completion_group(), manager.completionQueue ?: dispatch_get_main_queue(), ^{
                 if (self.completionHandler) {
-                    self.completionHandler(task.response, [NSData dataWithData:self.mutableData], error);
+                    self.completionHandler(task.response, responseObject, error);
                 }
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingTaskDidFinishNotification object:task userInfo:userInfo];
@@ -151,7 +164,11 @@ didCompleteWithError:(NSError *)error
         } else {
             dispatch_async(url_session_manager_processing_queue(), ^{
                 NSError *serializationError = nil;
-                id responseObject = [self.manager.responseSerializer responseObjectForResponse:task.response data:[NSData dataWithData:self.mutableData] error:&serializationError];
+                if (self.downloadFileURL) {
+                    responseObject = self.downloadFileURL;
+                } else {
+                    responseObject = [manager.responseSerializer responseObjectForResponse:task.response data:[NSData dataWithData:self.mutableData] error:&serializationError];
+                }
 
                 if (responseObject) {
                     userInfo[AFNetworkingTaskDidFinishSerializedResponseKey] = responseObject;
@@ -161,7 +178,7 @@ didCompleteWithError:(NSError *)error
                     userInfo[AFNetworkingTaskDidFinishErrorKey] = serializationError;
                 }
 
-                dispatch_group_async(self.manager.completionGroup ?: url_session_manager_completion_group(), self.manager.completionQueue ?: dispatch_get_main_queue(), ^{
+                dispatch_group_async(manager.completionGroup ?: url_session_manager_completion_group(), manager.completionQueue ?: dispatch_get_main_queue(), ^{
                     if (self.completionHandler) {
                         self.completionHandler(task.response, responseObject, serializationError);
                     }
@@ -171,12 +188,13 @@ didCompleteWithError:(NSError *)error
             });
         }
     }
+#pragma clang diagnostic pop
 }
 
 #pragma mark - NSURLSessionDataTaskDelegate
 
-- (void)URLSession:(NSURLSession *)session
-          dataTask:(NSURLSessionDataTask *)dataTask
+- (void)URLSession:(__unused NSURLSession *)session
+          dataTask:(__unused NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data
 {
     [self.mutableData appendData:data];
@@ -190,30 +208,24 @@ didCompleteWithError:(NSError *)error
       downloadTask:(NSURLSessionDownloadTask *)downloadTask
 didFinishDownloadingToURL:(NSURL *)location
 {
-    __block NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-    dispatch_async(url_session_manager_processing_queue(), ^{
-        NSError *fileManagerError = nil;
-        NSURL *fileURL = nil;
+    NSError *fileManagerError = nil;
+    self.downloadFileURL = nil;
 
-        if (self.downloadTaskDidFinishDownloading) {
-            fileURL = self.downloadTaskDidFinishDownloading(session, downloadTask, location);
-            if (fileURL) {
-                userInfo[AFNetworkingTaskDidFinishAssetPathKey] = fileURL;
+    if (self.downloadTaskDidFinishDownloading) {
+        self.downloadFileURL = self.downloadTaskDidFinishDownloading(session, downloadTask, location);
+        if (self.downloadFileURL) {
+            [[NSFileManager defaultManager] moveItemAtURL:location toURL:self.downloadFileURL error:&fileManagerError];
 
-                [[NSFileManager defaultManager] moveItemAtURL:location toURL:fileURL error:&fileManagerError];
-                if (fileManagerError) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:AFURLSessionDownloadTaskDidFailToMoveFileNotification object:downloadTask userInfo:fileManagerError.userInfo];
-
-                    userInfo[AFNetworkingTaskDidFinishErrorKey] = fileManagerError;
-                }
+            if (fileManagerError) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:AFURLSessionDownloadTaskDidFailToMoveFileNotification object:downloadTask userInfo:fileManagerError.userInfo];
             }
         }
-    });
+    }
 }
 
-- (void)URLSession:(NSURLSession *)session
-      downloadTask:(NSURLSessionDownloadTask *)downloadTask
-      didWriteData:(int64_t)bytesWritten
+- (void)URLSession:(__unused NSURLSession *)session
+      downloadTask:(__unused NSURLSessionDownloadTask *)downloadTask
+      didWriteData:(__unused int64_t)bytesWritten
  totalBytesWritten:(int64_t)totalBytesWritten
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
@@ -221,10 +233,13 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     self.downloadProgress.totalUnitCount = totalBytesExpectedToWrite;
 }
 
-- (void)URLSession:(NSURLSession *)session
-      downloadTask:(NSURLSessionDownloadTask *)downloadTask
+- (void)URLSession:(__unused NSURLSession *)session
+      downloadTask:(__unused NSURLSessionDownloadTask *)downloadTask
  didResumeAtOffset:(int64_t)fileOffset
-expectedTotalBytes:(int64_t)expectedTotalBytes {}
+expectedTotalBytes:(int64_t)expectedTotalBytes {
+    self.downloadProgress.completedUnitCount = fileOffset;
+    self.downloadProgress.totalUnitCount = expectedTotalBytes;
+}
 
 @end
 
@@ -247,6 +262,7 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {}
 @property (readwrite, nonatomic, copy) AFURLSessionDataTaskDidBecomeDownloadTaskBlock dataTaskDidBecomeDownloadTask;
 @property (readwrite, nonatomic, copy) AFURLSessionDataTaskDidReceiveDataBlock dataTaskDidReceiveData;
 @property (readwrite, nonatomic, copy) AFURLSessionDataTaskWillCacheResponseBlock dataTaskWillCacheResponse;
+@property (readwrite, nonatomic, copy) AFURLSessionDidFinishEventsForBackgroundURLSessionBlock didFinishEventsForBackgroundURLSession;
 @property (readwrite, nonatomic, copy) AFURLSessionDownloadTaskDidFinishDownloadingBlock downloadTaskDidFinishDownloading;
 @property (readwrite, nonatomic, copy) AFURLSessionDownloadTaskDidWriteDataBlock downloadTaskDidWriteData;
 @property (readwrite, nonatomic, copy) AFURLSessionDownloadTaskDidResumeBlock downloadTaskDidResume;
@@ -271,6 +287,8 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {}
     self.operationQueue = [[NSOperationQueue alloc] init];
     self.operationQueue.maxConcurrentOperationCount = NSOperationQueueDefaultMaxConcurrentOperationCount;
 
+    self.responseSerializer = [AFJSONResponseSerializer serializer];
+
     self.sessionConfiguration = configuration;
     self.session = [NSURLSession sessionWithConfiguration:self.sessionConfiguration delegate:self delegateQueue:self.operationQueue];
 
@@ -291,13 +309,13 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {}
     __block NSArray *tasks = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     [self.session getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks, NSArray *downloadTasks) {
-        if ([keyPath isEqualToString:@"dataTasks"]) {
+        if ([keyPath isEqualToString:NSStringFromSelector(@selector(dataTasks))]) {
             tasks = dataTasks;
-        } else if ([keyPath isEqualToString:@"uploadTasks"]) {
+        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(uploadTasks))]) {
             tasks = uploadTasks;
-        } else if ([keyPath isEqualToString:@"downloadTasks"]) {
+        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(downloadTasks))]) {
             tasks = downloadTasks;
-        } else if ([keyPath isEqualToString:@"tasks"]) {
+        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(tasks))]) {
             tasks = [@[dataTasks, uploadTasks, downloadTasks] valueForKeyPath:@"@unionOfArrays.self"];
         }
 
@@ -443,7 +461,7 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {}
                                  completionHandler:(void (^)(NSURLResponse *response, NSURL *filePath, NSError *error))completionHandler
 {
     AFURLSessionManagerTaskDelegate *delegate = [AFURLSessionManagerTaskDelegate delegateForManager:self completionHandler:completionHandler];
-    delegate.downloadTaskDidFinishDownloading = ^ NSURL * (NSURLSession *session, NSURLSessionDownloadTask *task, NSURL *location) {
+    delegate.downloadTaskDidFinishDownloading = ^NSURL * (NSURLSession * __unused session, NSURLSessionDownloadTask *task, NSURL *location) {
         if (destination) {
             return destination(location, task.response);
         }
@@ -508,6 +526,10 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {}
     self.dataTaskWillCacheResponse = block;
 }
 
+- (void)setDidFinishEventsForBackgroundURLSessionBlock:(void (^)(NSURLSession *session))block {
+    self.didFinishEventsForBackgroundURLSession = block;
+}
+
 #pragma mark -
 
 - (void)setDownloadTaskDidFinishDownloadingBlock:(NSURL * (^)(NSURLSession *session, NSURLSessionDownloadTask *downloadTask, NSURL *location))block {
@@ -530,6 +552,8 @@ didBecomeInvalidWithError:(NSError *)error
     if (self.sessionDidBecomeInvalid) {
         self.sessionDidBecomeInvalid(session, error);
     }
+   
+   [self.mutableTaskDelegatesKeyedByTaskIdentifier removeAllObjects];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:AFURLSessionDidInvalidateNotification object:session];
 }
@@ -543,6 +567,19 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
 
     if (self.sessionDidReceiveAuthenticationChallenge) {
         disposition = self.sessionDidReceiveAuthenticationChallenge(session, challenge, &credential);
+    } else {
+        if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+            if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+                if ([self.securityPolicy evaluateServerTrust:challenge.protectionSpace.serverTrust]) {
+                    disposition = NSURLSessionAuthChallengeUseCredential;
+                    credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+                } else {
+                    disposition = NSURLSessionAuthChallengeCancelAuthenticationChallenge;
+                }
+            } else {
+                disposition = NSURLSessionAuthChallengePerformDefaultHandling;
+            }
+        }
     }
 
     if (completionHandler) {
@@ -638,6 +675,8 @@ didCompleteWithError:(NSError *)error
     if (self.taskDidComplete) {
         self.taskDidComplete(session, task, error);
     }
+
+    [self.mutableTaskDelegatesKeyedByTaskIdentifier removeObjectForKey:@(task.taskIdentifier)];
 }
 
 #pragma mark - NSURLSessionDataDelegate
@@ -693,6 +732,14 @@ didBecomeDownloadTask:(NSURLSessionDownloadTask *)downloadTask
     if (completionHandler) {
         completionHandler(cachedResponse);
     }
+}
+
+- (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
+    if (self.didFinishEventsForBackgroundURLSession) {
+        self.didFinishEventsForBackgroundURLSession(session);
+    }
+   
+   [self.mutableTaskDelegatesKeyedByTaskIdentifier removeAllObjects];
 }
 
 #pragma mark - NSURLSessionDownloadDelegate
@@ -800,3 +847,5 @@ expectedTotalBytes:(int64_t)expectedTotalBytes
 }
 
 @end
+
+#endif

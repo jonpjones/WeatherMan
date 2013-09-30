@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 The Nerdery. All rights reserved.
 //
 
-#import "AFNetworking.h"
+#import "AFHTTPSessionManager.h"
 
 /**
  A block that will be called when the API request is complete.
