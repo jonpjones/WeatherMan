@@ -11,6 +11,7 @@
 		448D696F17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m in Sources */ = {isa = PBXBuildFile; fileRef = 448D696C17DF7D5500C6EB65 /* NSURLRequest+Umbrella.m */; };
 		448D697017DF7D5500C6EB65 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 448D696E17DF7D5500C6EB65 /* UIImage+ImageEffects.m */; };
 		448D697217DF7D7800C6EB65 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 448D697117DF7D7800C6EB65 /* Accelerate.framework */; };
+		44AF5F9C17F9FEDE004C180C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44AF5F9B17F9FEDE004C180C /* Images.xcassets */; };
 		585688AD160131D600AD5C9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688AC160131D600AD5C9D /* UIKit.framework */; };
 		585688AF160131D600AD5C9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688AE160131D600AD5C9D /* Foundation.framework */; };
 		585688B1160131D600AD5C9D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 585688B0160131D600AD5C9D /* CoreGraphics.framework */; };
@@ -29,6 +30,7 @@
 		448D696D17DF7D5500C6EB65 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
 		448D696E17DF7D5500C6EB65 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
 		448D697117DF7D7800C6EB65 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		44AF5F9B17F9FEDE004C180C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		585688A8160131D600AD5C9D /* Umbrella.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Umbrella.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		585688AC160131D600AD5C9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		585688AE160131D600AD5C9D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -112,6 +114,7 @@
 				588A8A551603C092002350AF /* ThirdParty */,
 				585688BB160131D600AD5C9D /* UMBAppDelegate.h */,
 				585688BC160131D600AD5C9D /* UMBAppDelegate.m */,
+				44AF5F9B17F9FEDE004C180C /* Images.xcassets */,
 				585688B3160131D600AD5C9D /* Supporting Files */,
 			);
 			path = Umbrella;
@@ -208,6 +211,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44AF5F9C17F9FEDE004C180C /* Images.xcassets in Resources */,
 				585688B7160131D600AD5C9D /* InfoPlist.strings in Resources */,
 				445B84E617271B140072E66C /* UMBMainViewController.xib in Resources */,
 			);
@@ -312,6 +316,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AF1D64D9000E4684A053DBEA /* Pods.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Umbrella/Umbrella-Prefix.pch";
 				INFOPLIST_FILE = "Umbrella/Umbrella-Info.plist";
@@ -327,6 +333,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AF1D64D9000E4684A053DBEA /* Pods.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Umbrella/Umbrella-Prefix.pch";
 				INFOPLIST_FILE = "Umbrella/Umbrella-Info.plist";
