@@ -10,6 +10,8 @@
 	<string>Umbrella</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>0599EA8425A6D7A49BC68815F15C11B0F86C0A02</key>
+		<string>https://git.nerderylabs.com/BRAVO.iOS.CodeChallenge</string>
 		<key>AB7FC440-1A50-4821-9957-10635CA04643</key>
 		<string>https://git.nerderylabs.com/BRAVO.iOS.CodeChallenge</string>
 	</dict>
@@ -17,15 +19,17 @@
 	<string>Umbrella.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>AB7FC440-1A50-4821-9957-10635CA04643</key>
+		<key>0599EA8425A6D7A49BC68815F15C11B0F86C0A02</key>
 		<string>..</string>
+		<key>AB7FC440-1A50-4821-9957-10635CA04643</key>
+		<string>../../BRAVO.iOS</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://git.nerderylabs.com/BRAVO.iOS.CodeChallenge</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>AB7FC440-1A50-4821-9957-10635CA04643</string>
+	<string>0599EA8425A6D7A49BC68815F15C11B0F86C0A02</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -35,6 +39,14 @@
 			<string>AB7FC440-1A50-4821-9957-10635CA04643</string>
 			<key>IDESourceControlWCCName</key>
 			<string>BRAVO.iOS</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>0599EA8425A6D7A49BC68815F15C11B0F86C0A02</string>
+			<key>IDESourceControlWCCName</key>
+			<string>BRAVO.iOS.CodeChallenge</string>
 		</dict>
 	</array>
 </dict>
