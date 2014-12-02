@@ -339,6 +339,7 @@ static inline BOOL AFStateTransitionIsValid(AFOperationState fromState, AFOperat
     }
     
     [self.lock lock];
+    
     if ([self isExecuting]) {
         [self performSelector:@selector(operationDidPause) onThread:[[self class] networkRequestThread] withObject:nil waitUntilDone:NO modes:[self.runLoopModes allObjects]];
         
@@ -349,6 +350,7 @@ static inline BOOL AFStateTransitionIsValid(AFOperationState fromState, AFOperat
     }
     
     self.state = AFOperationPausedState;
+    
     [self.lock unlock];
 }
 
@@ -464,7 +466,6 @@ static inline BOOL AFStateTransitionIsValid(AFOperationState fromState, AFOperat
             [self.outputStream scheduleInRunLoop:runLoop forMode:runLoopMode];
         }
         
-        [self.outputStream open];
         [self.connection start];
     }
     [self.lock unlock];
@@ -641,6 +642,8 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite
 didReceiveResponse:(NSURLResponse *)response
 {
     self.response = response;
+    
+    [self.outputStream open];
 }
 
 - (void)connection:(NSURLConnection __unused *)connection
@@ -723,7 +726,7 @@ didReceiveResponse:(NSURLResponse *)response
     }
 }
 
-#pragma mark - NSSecureCoding
+#pragma mark - NSecureCoding
 
 + (BOOL)supportsSecureCoding {
     return YES;

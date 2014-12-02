@@ -1,6 +1,14 @@
+# Uncomment this line to define a global platform for your project
+platform :ios, '8.0'
+
 source 'https://github.com/CocoaPods/Specs.git'
-source 'https://git.nerderylabs.com/BRAVO.iOS.NerderyPods/'
+	
+target 'Umbrella' do
+	# Used for network communication and image cache downloads
+	pod 'AFNetworking', '~>2.3.0'
+end
 
-platform :ios, '7.0'
+target 'UmbrellaTests' do
 
-pod 'AFNetworking'
+end
+

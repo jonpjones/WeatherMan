@@ -10,10 +10,16 @@
 
 @implementation NSURLRequest (Umbrella)
 
-+ (NSURLRequest *)weatherRequestForIcon:(NSString *)icon
++ (NSURLRequest *)nrd_weatherRequestForIcon:(NSString *)icon highlighted:(BOOL)highlighted
 {
-    NSURL *iconURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://dl.dropboxusercontent.com/u/2141923/umbrella/%@.png", icon]];
+    NSString *formatString = @"http://nerdery-umbrella.s3.amazonaws.com/%@.png";
+    if (highlighted) {
+        formatString = @"http://nerdery-umbrella.s3.amazonaws.com/%@-selected.png";
+    }
+    
+    NSURL *iconURL = [NSURL URLWithString:[NSString stringWithFormat:formatString, icon]];
     return [NSURLRequest requestWithURL:iconURL];
 }
+
 
 @end

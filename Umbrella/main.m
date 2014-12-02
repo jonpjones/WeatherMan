@@ -2,17 +2,15 @@
 //  main.m
 //  Umbrella
 //
-//  Created by Ben Dolmar on 9/12/12.
-//  Copyright (c) 2012 Ben Dolmar. All rights reserved.
+//  Created by Jon Rexeisen on 11/25/14.
+//  Copyright (c) 2014 The Nerdery. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
+#import "AppDelegate.h"
 
-#import "UMBAppDelegate.h"
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char * argv[]) {
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([UMBAppDelegate class]));
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }

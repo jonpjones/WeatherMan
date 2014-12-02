@@ -281,8 +281,6 @@ NSOperationQueue *operationQueue = manager.operationQueue;
             break;
     }
 }];
-
-[manager.reachabilityManager startMonitoring];
 ```
 
 ---
