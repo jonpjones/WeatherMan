@@ -12,14 +12,8 @@
 
 + (NSURLRequest *)nrd_weatherRequestForIcon:(NSString *)icon highlighted:(BOOL)highlighted
 {
-    NSString *formatString = @"http://nerdery-umbrella.s3.amazonaws.com/%@.png";
-    if (highlighted) {
-        formatString = @"http://nerdery-umbrella.s3.amazonaws.com/%@-selected.png";
-    }
-    
-    NSURL *iconURL = [NSURL URLWithString:[NSString stringWithFormat:formatString, icon]];
+    NSURL *iconURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://nerdery-umbrella.s3.amazonaws.com/%@%@.png", icon, (highlighted) ? @"-selected" : @""]];
     return [NSURLRequest requestWithURL:iconURL];
 }
-
 
 @end

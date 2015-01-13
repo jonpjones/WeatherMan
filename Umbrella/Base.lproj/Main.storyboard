@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14C68m" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C94b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <scenes>
         <!--Weather View Controller-->
@@ -16,9 +16,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Njl-QI-tDt">
-                                <rect key="frame" x="277" y="285" width="46" height="30"/>
-                                <state key="normal" title="Button">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Njl-QI-tDt">
+                                <rect key="frame" x="290" y="289" width="20" height="22"/>
+                                <state key="normal" image="settingsCog">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
@@ -26,12 +26,13 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.011764705882352941" green="0.66274509803921566" blue="0.95686274509803915" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstAttribute="centerX" secondItem="Njl-QI-tDt" secondAttribute="centerX" id="fbX-Pa-AZs"/>
                             <constraint firstAttribute="centerY" secondItem="Njl-QI-tDt" secondAttribute="centerY" id="xv1-ZJ-G5e"/>
                         </constraints>
                     </view>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
@@ -48,12 +49,87 @@
                     <view key="view" contentMode="scaleToFill" id="uKK-va-xIp">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <subviews>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4dd-LZ-r6Y">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="nUX-3u-aSF">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter Zip Code" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="x9N-x1-9M3">
+                                            <rect key="frame" x="20" y="45" width="560" height="30"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <textInputTraits key="textInputTraits"/>
+                                        </textField>
+                                        <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UvB-jd-YZB">
+                                            <rect key="frame" x="188" y="75" width="225" height="128"/>
+                                            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="aiE-T7-UAG">
+                                                <rect key="frame" x="0.0" y="0.0" width="225" height="128"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="hva-uf-umj">
+                                                        <rect key="frame" x="0.0" y="25" width="225" height="29"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="225" id="Sbk-LS-b9X"/>
+                                                        </constraints>
+                                                        <segments>
+                                                            <segment title="Fahrenheit"/>
+                                                            <segment title="Celsius"/>
+                                                        </segments>
+                                                    </segmentedControl>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UBp-5D-EV2">
+                                                        <rect key="frame" x="57" y="78" width="110" height="30"/>
+                                                        <state key="normal" title="Get the weather">
+                                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                        </state>
+                                                        <connections>
+                                                            <action selector="getTheWeatherButtonTapped:" destination="FDC-EK-ro1" eventType="touchUpInside" id="K6r-Jt-Urd"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="bottom" secondItem="UBp-5D-EV2" secondAttribute="bottom" constant="20" id="0Hm-CD-6IN"/>
+                                                    <constraint firstItem="hva-uf-umj" firstAttribute="leading" secondItem="aiE-T7-UAG" secondAttribute="leading" id="6Eu-62-6N4"/>
+                                                    <constraint firstAttribute="centerX" secondItem="hva-uf-umj" secondAttribute="centerX" id="HDR-YP-ceK"/>
+                                                    <constraint firstItem="hva-uf-umj" firstAttribute="top" secondItem="aiE-T7-UAG" secondAttribute="top" constant="25" id="V8F-9f-ibW"/>
+                                                    <constraint firstAttribute="centerX" secondItem="UBp-5D-EV2" secondAttribute="centerX" id="aC3-Db-7AZ"/>
+                                                    <constraint firstItem="UBp-5D-EV2" firstAttribute="top" secondItem="hva-uf-umj" secondAttribute="bottom" constant="25" id="d5I-sA-TQX"/>
+                                                    <constraint firstAttribute="trailing" secondItem="hva-uf-umj" secondAttribute="trailing" id="mB4-Mt-5eq"/>
+                                                </constraints>
+                                            </view>
+                                            <vibrancyEffect>
+                                                <blurEffect style="dark"/>
+                                            </vibrancyEffect>
+                                        </visualEffectView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="x9N-x1-9M3" firstAttribute="top" secondItem="nUX-3u-aSF" secondAttribute="top" constant="45" id="1VB-tS-eBa"/>
+                                        <constraint firstItem="UvB-jd-YZB" firstAttribute="top" secondItem="x9N-x1-9M3" secondAttribute="bottom" id="5r8-LC-jvP"/>
+                                        <constraint firstAttribute="trailing" secondItem="x9N-x1-9M3" secondAttribute="trailing" constant="20" id="JBd-Yu-ADi"/>
+                                        <constraint firstItem="x9N-x1-9M3" firstAttribute="leading" secondItem="nUX-3u-aSF" secondAttribute="leading" constant="20" id="MW6-vK-Hzr"/>
+                                        <constraint firstAttribute="centerX" secondItem="UvB-jd-YZB" secondAttribute="centerX" id="k8y-iW-XJR"/>
+                                    </constraints>
+                                </view>
+                                <blurEffect style="dark"/>
+                            </visualEffectView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="4dd-LZ-r6Y" firstAttribute="leading" secondItem="uKK-va-xIp" secondAttribute="leading" id="9Uj-VR-wNt"/>
+                            <constraint firstAttribute="trailing" secondItem="4dd-LZ-r6Y" secondAttribute="trailing" id="OOX-2N-tzc"/>
+                            <constraint firstItem="9gO-Qd-lmL" firstAttribute="top" secondItem="4dd-LZ-r6Y" secondAttribute="bottom" id="amG-h2-TcL"/>
+                            <constraint firstItem="4dd-LZ-r6Y" firstAttribute="top" secondItem="uKK-va-xIp" secondAttribute="top" id="ra6-AS-031"/>
+                        </constraints>
                     </view>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pIO-eC-k1O" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1041" y="415"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="settingsCog" width="20" height="20"/>
+    </resources>
 </document>

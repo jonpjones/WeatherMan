@@ -29,9 +29,9 @@
     UIColor *coolColor = [UIColor colorWithRed:3.0f / 255.0f green:169.0f / 255.0f blue:244.0f / 255.0f alpha:1.0f];
     
     // The client will barf if you don't call this first
-    [[WeatherAPIClient sharedClient] setAPIKey:@"YOUR API KEY"];
+    [[WeatherAPIClient sharedClient] setAPIKey:@"YOUR_API_KEY"];
     
-    // Here is how you’d actually call this
+    // Here is how you’d actually call this.
     [[WeatherAPIClient sharedClient] getForecastAndConditionsForZipCode:@"90210" withCompletionBlock:^(BOOL success, NSDictionary *result, NSError *error) {
         // Completion block, yo.
     }];

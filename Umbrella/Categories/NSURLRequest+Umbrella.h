@@ -11,7 +11,7 @@
 @interface NSURLRequest (Umbrella)
 
 /**
- *  Given a weather icon, like `clear`, generates a URLRequest pointing to the appropriate resource
+ *  Given a weather icon, like @c clear, generates a URLRequest pointing to the appropriate resource
  *
  *  @param icon        The icon to fetch
  *  @param highlighted @c YES to get an filled in icon, appropriate for filling in
