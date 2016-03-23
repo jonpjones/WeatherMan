@@ -12,12 +12,11 @@
 		44DE82BB1BCDF45900A319D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44DE82BA1BCDF45900A319D2 /* Assets.xcassets */; };
 		44DE82BE1BCDF45900A319D2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 44DE82BC1BCDF45900A319D2 /* LaunchScreen.storyboard */; };
 		44DE82C91BCDF45900A319D2 /* UmbrellaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82C81BCDF45900A319D2 /* UmbrellaTests.swift */; };
-		44DE82D71BCDF4BA00A319D2 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82D61BCDF4BA00A319D2 /* SettingsViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		44DE82D91BCDF4C500A319D2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82D81BCDF4C500A319D2 /* MainViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		44DE82DB1BCDF4FE00A319D2 /* metrics.md in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82DA1BCDF4FE00A319D2 /* metrics.md */; settings = {ASSET_TAGS = (); }; };
-		44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82DC1BCDF7C800A319D2 /* UIColor+Nerdery.swift */; settings = {ASSET_TAGS = (); }; };
-		44DE82DF1BCDF8EE00A319D2 /* WeatherRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82DE1BCDF8EE00A319D2 /* WeatherRequest.swift */; settings = {ASSET_TAGS = (); }; };
-		44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82E01BCDFBBB00A319D2 /* String+Umbrella.swift */; settings = {ASSET_TAGS = (); }; };
+		44DE82D71BCDF4BA00A319D2 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82D61BCDF4BA00A319D2 /* SettingsViewController.swift */; };
+		44DE82D91BCDF4C500A319D2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82D81BCDF4C500A319D2 /* MainViewController.swift */; };
+		44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82DC1BCDF7C800A319D2 /* UIColor+Nerdery.swift */; };
+		44DE82DF1BCDF8EE00A319D2 /* WeatherRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82DE1BCDF8EE00A319D2 /* WeatherRequest.swift */; };
+		44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82E01BCDFBBB00A319D2 /* String+Umbrella.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -254,7 +253,6 @@
 				44DE82DF1BCDF8EE00A319D2 /* WeatherRequest.swift in Sources */,
 				44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */,
 				44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */,
-				44DE82DB1BCDF4FE00A319D2 /* metrics.md in Sources */,
 				44DE82D91BCDF4C500A319D2 /* MainViewController.swift in Sources */,
 				44DE82B41BCDF45900A319D2 /* AppDelegate.swift in Sources */,
 				44DE82D71BCDF4BA00A319D2 /* SettingsViewController.swift in Sources */,
