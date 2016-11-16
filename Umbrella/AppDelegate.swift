@@ -13,11 +13,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
         fatalError("Look at me first")
-        // All the layout metrics are contained in the file called metrics.md located as a descendant of the Supporting Files group
+        // All the layout metrics are contained in the file called metrics.md located as a sibling of the AppDelegate.swift.
         // Reference screen shots are contained in the reference images folder located as a descendant of the Umbrella group
         
         // Our designer didn't use the actual degree symbol, but used the "ring above" symbol (option+K) ˚ instead
@@ -57,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
-    func applicationDidBecomeActive(application: UIApplication) {
+    func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
 

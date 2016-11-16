@@ -18,19 +18,19 @@ struct WeatherRequest {
     /// The zip code to send to the server.
     var zipCode: String?
     
-    var URL: NSURL? {
+    var URL: Foundation.URL? {
         get {
             /// If there is no zip code, there is no url
             guard let zip = zipCode else {
                 return nil
             }
             
-            let urlComponents = NSURLComponents()
+            var urlComponents = URLComponents()
             urlComponents.scheme = "https"
             urlComponents.host = "api.wunderground.com"
             urlComponents.path = "/api/\(APIKey)/conditions/hourly/q/\(zip).json"
             
-            return urlComponents.URL
+            return urlComponents.url
             
         }
     }

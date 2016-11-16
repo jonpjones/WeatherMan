@@ -17,8 +17,8 @@ extension String {
     
     - returns: The URL to be used within the application
     */
-    func nrd_weatherIconURL(highlighted highlighted: Bool = false) -> NSURL? {
-        let urlComponents = NSURLComponents()
+    func nrd_weatherIconURL(highlighted: Bool = false) -> URL? {
+        var urlComponents = URLComponents()
         urlComponents.scheme = "https"
         urlComponents.host = "nerdery-umbrella.s3.amazonaws.com"
         
@@ -28,7 +28,7 @@ extension String {
             urlComponents.path = "/\(self).png"
         }
         
-        return urlComponents.URL
+        return urlComponents.url
     }
     
 }
