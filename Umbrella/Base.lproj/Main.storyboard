@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2657" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -21,7 +22,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="hwj-bF-FWv">
-                                <rect key="frame" x="0.0" y="166" width="600" height="434"/>
+                                <frame key="frameInset" minY="270" width="600" height="330"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="npG-sO-eSE">
@@ -45,16 +46,55 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="oBP-OB-sOZ"/>
                                 </connections>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l8h-XW-e3E">
-                                <rect key="frame" x="20" y="20" width="147" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Settings"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P3I-R7-Max">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="MzY-qt-O1m"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="50˚" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Laq-pH-LBg">
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="Laq-pH-LBg" secondAttribute="height" multiplier="1:1" id="7Xl-X4-29y"/>
+                                    <constraint firstAttribute="width" constant="120" id="7wT-Wu-ePX"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="thin" pointSize="60"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l8h-XW-e3E">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="45" id="7rP-Ee-lpT"/>
+                                    <constraint firstAttribute="height" constant="45" id="C3c-jQ-ZLs"/>
+                                </constraints>
+                                <state key="normal" image="settingsCog"/>
                                 <connections>
                                     <segue destination="YI1-vi-hdI" kind="show" id="wwa-Co-UVG"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KGA-FC-pVc">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="115" id="ty4-l4-aru"/>
+                                    <constraint firstAttribute="height" constant="30" id="wWV-j3-KLH"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.95183771849999999" green="0.64615827800000003" blue="0.2125451267" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="KGA-FC-pVc" firstAttribute="top" secondItem="Laq-pH-LBg" secondAttribute="bottom" constant="5" id="9DE-jC-5JR"/>
+                            <constraint firstItem="P3I-R7-Max" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.5" id="IAM-aj-add"/>
+                            <constraint firstItem="Laq-pH-LBg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="YLt-v0-TVD"/>
+                            <constraint firstItem="l8h-XW-e3E" firstAttribute="top" secondItem="P3I-R7-Max" secondAttribute="bottom" constant="-40" id="ZOM-wa-mx3"/>
+                            <constraint firstAttribute="trailing" secondItem="l8h-XW-e3E" secondAttribute="trailing" constant="10" id="gbP-Tz-mHm"/>
+                            <constraint firstItem="Laq-pH-LBg" firstAttribute="top" secondItem="P3I-R7-Max" secondAttribute="baseline" constant="5" id="ge1-dq-8lG"/>
+                            <constraint firstItem="KGA-FC-pVc" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="mDK-2W-p1B"/>
+                            <constraint firstItem="P3I-R7-Max" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="30" id="vvy-6J-dNQ"/>
+                            <constraint firstItem="P3I-R7-Max" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="10" id="z5o-hl-0eM"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="hwj-bF-FWv" id="qfv-0Y-gvu"/>
@@ -62,7 +102,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="164" y="597"/>
+            <point key="canvasLocation" x="164" y="596.85157421289364"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="cKm-H6-v98">
@@ -77,7 +117,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nk9-rc-H9U">
-                                <rect key="frame" x="20" y="28" width="282" height="30"/>
+                                <frame key="frameInset" minX="20" minY="28" width="282" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="RETURN FROM WHENCE I CAME"/>
                                 <connections>
@@ -94,4 +134,7 @@
             <point key="canvasLocation" x="932" y="597"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="settingsCog" width="20" height="20"/>
+    </resources>
 </document>

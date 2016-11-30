@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		13FC691B1DECFA3C004F28D7 /* WeatherAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */; };
 		44DE82B41BCDF45900A319D2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82B31BCDF45900A319D2 /* AppDelegate.swift */; };
 		44DE82B91BCDF45900A319D2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 44DE82B71BCDF45900A319D2 /* Main.storyboard */; };
 		44DE82BB1BCDF45900A319D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44DE82BA1BCDF45900A319D2 /* Assets.xcassets */; };
@@ -30,6 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherAPIManager.swift; sourceTree = "<group>"; };
 		44AEF0281BDA729E0056621F /* landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = landscape.png; sourceTree = "<group>"; };
 		44AEF0291BDA729E0056621F /* portrait-warm.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "portrait-warm.png"; sourceTree = "<group>"; };
 		44AEF02A1BDA729E0056621F /* portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait.png; sourceTree = "<group>"; };
@@ -69,6 +71,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		13FC691C1DECFC30004F28D7 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */,
+			);
+			name = Managers;
+			sourceTree = "<group>";
+		};
 		44AEF0271BDA729E0056621F /* Reference Images */ = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +112,7 @@
 		44DE82B21BCDF45900A319D2 /* Umbrella */ = {
 			isa = PBXGroup;
 			children = (
+				13FC691C1DECFC30004F28D7 /* Managers */,
 				44DE82D51BCDF4A700A319D2 /* Extensions */,
 				44DE82D41BCDF49900A319D2 /* Models */,
 				44DE82D31BCDF48D00A319D2 /* View Controllers */,
@@ -257,6 +268,7 @@
 				44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */,
 				44DE82D91BCDF4C500A319D2 /* MainViewController.swift in Sources */,
 				44DE82B41BCDF45900A319D2 /* AppDelegate.swift in Sources */,
+				13FC691B1DECFA3C004F28D7 /* WeatherAPIManager.swift in Sources */,
 				44DE82D71BCDF4BA00A319D2 /* SettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

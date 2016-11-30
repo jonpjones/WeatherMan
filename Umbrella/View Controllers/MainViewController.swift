@@ -14,6 +14,18 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Setup the request
+        var weatherRequest = WeatherRequest(APIKey: "833018b6135efd73")
+        
+        // Set the zip code
+        weatherRequest.zipCode = "60647"
+        
+        // Here's your URL. Marshall this to the internet however you please.
+        let url = weatherRequest.URL
+        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: url!)
+        
+
 
         // Do any additional setup after loading the view.
     }
@@ -42,18 +54,18 @@ class MainViewController: UIViewController {
 extension MainViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        fatalError()
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        fatalError()
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        fatalError()
+        return UICollectionViewCell()
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        fatalError()
+        return UICollectionReusableView()
     }
 }

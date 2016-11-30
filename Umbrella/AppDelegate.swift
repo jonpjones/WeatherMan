@@ -16,7 +16,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        fatalError("Look at me first")
         // All the layout metrics are contained in the file called metrics.md located as a sibling of the AppDelegate.swift.
         // Reference screen shots are contained in the reference images folder located as a descendant of the Umbrella group
         
@@ -28,16 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let warmColor = UIColor(0xFF9800)
         let coolColor = UIColor(0x03A9F4)
         
-        // Setup the request
-        var weatherRequest = WeatherRequest(APIKey: "YOUR API KEY")
-        
-        // Set the zip code
-        weatherRequest.zipCode = "90210"
-        
-        // Here's your URL. Marshall this to the internet however you please.
-        let url = weatherRequest.URL
-        
-        // Here’s where to look for the information, because let’s be honest, you know how to read JSON
+               // Here’s where to look for the information, because let’s be honest, you know how to read JSON
         // All values are as of October 13, 2015
         
         // Current Conditions
@@ -59,6 +49,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    }
+    
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        
     }
 
 }
