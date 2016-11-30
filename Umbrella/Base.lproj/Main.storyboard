@@ -21,9 +21,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="hwj-bF-FWv">
-                                <frame key="frameInset" minY="270" width="600" height="330"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="hwj-bF-FWv">
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="npG-sO-eSE">
                                     <size key="itemSize" width="50" height="50"/>
@@ -83,14 +81,18 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" red="0.95183771849999999" green="0.64615827800000003" blue="0.2125451267" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="1" green="0.49803921568627452" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="KGA-FC-pVc" firstAttribute="top" secondItem="Laq-pH-LBg" secondAttribute="bottom" constant="5" id="9DE-jC-5JR"/>
+                            <constraint firstItem="hwj-bF-FWv" firstAttribute="top" secondItem="KGA-FC-pVc" secondAttribute="bottom" constant="5" id="AUe-aV-xQY"/>
                             <constraint firstItem="P3I-R7-Max" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.5" id="IAM-aj-add"/>
+                            <constraint firstItem="hwj-bF-FWv" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="MUV-1Y-TGK"/>
                             <constraint firstItem="Laq-pH-LBg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="YLt-v0-TVD"/>
                             <constraint firstItem="l8h-XW-e3E" firstAttribute="top" secondItem="P3I-R7-Max" secondAttribute="bottom" constant="-40" id="ZOM-wa-mx3"/>
                             <constraint firstAttribute="trailing" secondItem="l8h-XW-e3E" secondAttribute="trailing" constant="10" id="gbP-Tz-mHm"/>
                             <constraint firstItem="Laq-pH-LBg" firstAttribute="top" secondItem="P3I-R7-Max" secondAttribute="baseline" constant="5" id="ge1-dq-8lG"/>
+                            <constraint firstAttribute="trailing" secondItem="hwj-bF-FWv" secondAttribute="trailing" id="iU3-d5-liD"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="hwj-bF-FWv" secondAttribute="bottom" id="ilj-1J-lLZ"/>
                             <constraint firstItem="KGA-FC-pVc" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="mDK-2W-p1B"/>
                             <constraint firstItem="P3I-R7-Max" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="30" id="vvy-6J-dNQ"/>
                             <constraint firstItem="P3I-R7-Max" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="10" id="z5o-hl-0eM"/>

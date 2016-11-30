@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		13FC691B1DECFA3C004F28D7 /* WeatherAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */; };
+		13FC691E1DEF27F3004F28D7 /* CurrentWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */; };
+		13FC69201DEF2B32004F28D7 /* HourlyWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691F1DEF2B32004F28D7 /* HourlyWeather.swift */; };
+		13FC69221DEF3483004F28D7 /* CurrentSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC69211DEF3483004F28D7 /* CurrentSettings.swift */; };
+		13FC69241DEF3711004F28D7 /* WeatherInfoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC69231DEF3711004F28D7 /* WeatherInfoManager.swift */; };
 		44DE82B41BCDF45900A319D2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82B31BCDF45900A319D2 /* AppDelegate.swift */; };
 		44DE82B91BCDF45900A319D2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 44DE82B71BCDF45900A319D2 /* Main.storyboard */; };
 		44DE82BB1BCDF45900A319D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44DE82BA1BCDF45900A319D2 /* Assets.xcassets */; };
@@ -32,6 +36,10 @@
 
 /* Begin PBXFileReference section */
 		13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherAPIManager.swift; sourceTree = "<group>"; };
+		13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentWeather.swift; sourceTree = "<group>"; };
+		13FC691F1DEF2B32004F28D7 /* HourlyWeather.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HourlyWeather.swift; sourceTree = "<group>"; };
+		13FC69211DEF3483004F28D7 /* CurrentSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentSettings.swift; sourceTree = "<group>"; };
+		13FC69231DEF3711004F28D7 /* WeatherInfoManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherInfoManager.swift; sourceTree = "<group>"; };
 		44AEF0281BDA729E0056621F /* landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = landscape.png; sourceTree = "<group>"; };
 		44AEF0291BDA729E0056621F /* portrait-warm.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "portrait-warm.png"; sourceTree = "<group>"; };
 		44AEF02A1BDA729E0056621F /* portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait.png; sourceTree = "<group>"; };
@@ -75,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */,
+				13FC69231DEF3711004F28D7 /* WeatherInfoManager.swift */,
 			);
 			name = Managers;
 			sourceTree = "<group>";
@@ -148,6 +157,9 @@
 			isa = PBXGroup;
 			children = (
 				44DE82DE1BCDF8EE00A319D2 /* WeatherRequest.swift */,
+				13FC69211DEF3483004F28D7 /* CurrentSettings.swift */,
+				13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */,
+				13FC691F1DEF2B32004F28D7 /* HourlyWeather.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -263,8 +275,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13FC69241DEF3711004F28D7 /* WeatherInfoManager.swift in Sources */,
+				13FC69221DEF3483004F28D7 /* CurrentSettings.swift in Sources */,
 				44DE82DF1BCDF8EE00A319D2 /* WeatherRequest.swift in Sources */,
 				44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */,
+				13FC691E1DEF27F3004F28D7 /* CurrentWeather.swift in Sources */,
+				13FC69201DEF2B32004F28D7 /* HourlyWeather.swift in Sources */,
 				44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */,
 				44DE82D91BCDF4C500A319D2 /* MainViewController.swift in Sources */,
 				44DE82B41BCDF45900A319D2 /* AppDelegate.swift in Sources */,
