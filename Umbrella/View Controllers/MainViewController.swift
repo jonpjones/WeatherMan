@@ -14,6 +14,8 @@ class MainViewController: UIViewController {
     @IBOutlet weak var currentTempLabel: UILabel!
     @IBOutlet weak var currentConditionsLabel: UILabel!
     
+    
+    
     var daysHourlyWeatherArray: [[HourlyWeather]]?
     
     @IBOutlet weak var collectionView: UICollectionView!
@@ -47,12 +49,44 @@ class MainViewController: UIViewController {
         
     }
     
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    @IBAction func settingsButtonTapped(_ sender: UIButton) {
+        let settingsViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "settingsID") as! SettingsViewController
+        self.definesPresentationContext = true
+        self.modalPresentationStyle = .currentContext
+        settingsViewController.delegate = self
+        
+        settingsViewController.modalPresentationStyle = .overCurrentContext
+        settingsViewController.popoverPresentationController?.delegate = self
+        settingsViewController.popoverPresentationController?.sourceRect = sender.frame
+        settingsViewController.popoverPresentationController?.sourceView = sender
+        settingsViewController.popoverPresentationController?.canOverlapSourceViewRect = true
+        settingsViewController.preferredContentSize = view.frame.size
+        
+        self.present(settingsViewController, animated: true, completion: nil)
+    }
+    
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        
         
         // Set the popover presentation style delegate to always force a popover
+        
+        
+        //I found that when forcing the segue to be a popover using the presentation style delegate, the subviews beneath popover were removed, leaving a generally uninteresting and blank area beneath the blurred background of the settings controller. Since the sample designs look like the settings view controller cover the screen, I think that a vertical modal presentation is appropriate - and also the only modal presentation style that supports being presented over the current context.
+    }
+}
+
+extension MainViewController: SettingsViewControllerDelegate {
+    func preferredTemperatureStyleChanged() {
+        let currentTemp = currentSettings.fahrenheight ? weatherInfo.currentWeather?.tempF : weatherInfo.currentWeather?.tempC
+        currentTempLabel.text = "\(currentTemp)˚"
+        collectionView.reloadData()
+    }
+}
+
+extension MainViewController: UIPopoverPresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
     }
 }
 
