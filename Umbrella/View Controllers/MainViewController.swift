@@ -10,6 +10,12 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    @IBOutlet weak var currentLocationLabel: UILabel!
+    @IBOutlet weak var currentTempLabel: UILabel!
+    @IBOutlet weak var currentConditionsLabel: UILabel!
+    
+    var daysHourlyWeatherArray: [[HourlyWeather]]?
+    
     @IBOutlet weak var collectionView: UICollectionView!
 
     override func viewDidLoad() {
@@ -50,32 +56,67 @@ class MainViewController: UIViewController {
     }
 }
 
+//MARK: - WeatherInfoDelegate
 extension MainViewController: WeatherInfoDelegate {
     func received(currentWeather: CurrentWeather) {
-        
+        let currentTemp = currentSettings.fahrenheight ? currentWeather.tempF : currentWeather.tempC
+        view.backgroundColor = currentWeather.tempF > 60 ? UIColor(0xFF9800) : UIColor(0x03A9F4)
+        currentTempLabel.text = "\(currentTemp)˚"
+        currentLocationLabel.text = currentWeather.fullLocation
+        currentConditionsLabel.text = currentWeather.conditions
     }
     
-    func receivedHourlyWeather(todaysWeather: [HourlyWeather]?, tomorrowsWeather: [HourlyWeather]?) {
-        
+    func receivedHourlyWeather(forDays: [[HourlyWeather]]) {
+        daysHourlyWeatherArray = forDays
+        collectionView.reloadData()
     }
+   
 }
 
 // MARK: - UICollectionViewDataSource
 extension MainViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 0
+        return daysHourlyWeatherArray?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 0
+        let day = daysHourlyWeatherArray?[section]
+        return day?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return UICollectionViewCell()
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HourlyCellID", for: indexPath) as! HourlyWeatherCollectionViewCell
+        let day = daysHourlyWeatherArray?[indexPath.section]
+        let hour = day?[indexPath.item]
+        
+        cell.timeLabel.text = hour?.timeString
+        cell.tempLabel.text = currentSettings.fahrenheight ? hour?.tempF : hour?.tempC
+        cell.tint = hour?.tintColor
+        
+        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         return UICollectionReusableView()
     }
 }
+//MARK: - UICollectionViewDelegateFlowLayout
+extension MainViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: 62, height: 62)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 20
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 10
+    }
+}
+

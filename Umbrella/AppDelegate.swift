@@ -40,9 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Temp         : hourly_forecast.temp.(english || metric)
         
         // How to use the icon name to get the URL. Solid icons are used for the daily highs and lows
-        let solidIcon = "clear".nrd_weatherIconURL(highlighted: true)
-        let outlineIcon = "clear".nrd_weatherIconURL()
-        
+               
         return true
     }
 

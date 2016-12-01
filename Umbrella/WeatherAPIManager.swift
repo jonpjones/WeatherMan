@@ -7,10 +7,10 @@
 //
 
 import Foundation
-
+import UIKit
 class WeatherAPIManager {
     static let sharedInstance = WeatherAPIManager()
-    
+   
     func fetchHourlyForecast(fromURL: URL) {
         URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
             
@@ -19,7 +19,8 @@ class WeatherAPIManager {
                 let weatherJSON = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
                 
                 guard let currentObservation = weatherJSON?["current_observation"] as? [String: Any] else { return }
-                let locationName = (currentObservation["current_observation"] as? [String: String])?["full"] ?? "Unknown Location"
+                let locationName = (currentObservation["observation_location"] as? [String: String])?["full"] ?? "Unknown Location"
+                
                 let tempF = currentObservation["temp_f"] as! Double
                 let tempC = currentObservation["temp_c"] as! Double
                 let conditions = currentObservation["weather"] as! String
@@ -43,9 +44,9 @@ class WeatherAPIManager {
                     let isTomorrow = calendar.isDateInTomorrow(date)
                     let tempC = (hour["temp"] as! [String: String])["metric"]!
                     let tempF = (hour["temp"] as! [String: String])["english"]!
-                    let icon = hour["icon"] as? String ?? "clear"
+                    let icon = hour["icon"] as! String
 
-                    let hourlyWeather = HourlyWeather(iconName: icon, tempC: tempC, tempF: tempF, timeString: civilTime, timeSince1970: Double(epoch)!, tintColor: nil, isToday: isToday, isTomorrow: isTomorrow)
+                    let hourlyWeather = HourlyWeather(iconName: icon, tempC: tempC, tempF: tempF, timeString: civilTime, timeSince1970: Double(epoch)!, isToday: isToday, isTomorrow: isTomorrow)
                     
                     hourlyWeatherArray.append(hourlyWeather)
                 }
@@ -58,5 +59,10 @@ class WeatherAPIManager {
                 print("Not convertable")
             }
         }.resume()
+    }
+    
+    func fetchIcon(name: String, solid: Bool) {
+ 
+        
     }
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1371172B1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */; };
 		13FC691B1DECFA3C004F28D7 /* WeatherAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */; };
 		13FC691E1DEF27F3004F28D7 /* CurrentWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */; };
 		13FC69201DEF2B32004F28D7 /* HourlyWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691F1DEF2B32004F28D7 /* HourlyWeather.swift */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HourlyWeatherCollectionViewCell.swift; sourceTree = "<group>"; };
 		13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherAPIManager.swift; sourceTree = "<group>"; };
 		13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentWeather.swift; sourceTree = "<group>"; };
 		13FC691F1DEF2B32004F28D7 /* HourlyWeather.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HourlyWeather.swift; sourceTree = "<group>"; };
@@ -79,6 +81,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1371172C1DF084DE008BEE6F /* Model Views */ = {
+			isa = PBXGroup;
+			children = (
+				1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */,
+			);
+			name = "Model Views";
+			sourceTree = "<group>";
+		};
 		13FC691C1DECFC30004F28D7 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
@@ -156,6 +166,7 @@
 		44DE82D41BCDF49900A319D2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				1371172C1DF084DE008BEE6F /* Model Views */,
 				44DE82DE1BCDF8EE00A319D2 /* WeatherRequest.swift */,
 				13FC69211DEF3483004F28D7 /* CurrentSettings.swift */,
 				13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */,
@@ -281,6 +292,7 @@
 				44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */,
 				13FC691E1DEF27F3004F28D7 /* CurrentWeather.swift in Sources */,
 				13FC69201DEF2B32004F28D7 /* HourlyWeather.swift in Sources */,
+				1371172B1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift in Sources */,
 				44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */,
 				44DE82D91BCDF4C500A319D2 /* MainViewController.swift in Sources */,
 				44DE82B41BCDF45900A319D2 /* AppDelegate.swift in Sources */,

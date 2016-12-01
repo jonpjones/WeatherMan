@@ -1,5 +1,5 @@
 # Weather Screen
-* The warm color is .
+* The warm color is 0xFF9800
 * The cool color is 0x03A9F4.
 
 ## Current Conditions
