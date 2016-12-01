@@ -24,8 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Throw a comment if you want on which you chose and why.
         
         // UIColors for the use for reference in the rest of the application
-        let warmColor = UIColor(0xFF9800)
-        let coolColor = UIColor(0x03A9F4)
+        
         
                // Here’s where to look for the information, because let’s be honest, you know how to read JSON
         // All values are as of October 13, 2015

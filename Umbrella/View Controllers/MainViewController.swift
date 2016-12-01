@@ -14,7 +14,7 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        weatherInfo.delegate = self
         // Setup the request
         var weatherRequest = WeatherRequest(APIKey: "833018b6135efd73")
         
@@ -47,6 +47,16 @@ class MainViewController: UIViewController {
         // Pass the selected object to the new view controller.
         
         // Set the popover presentation style delegate to always force a popover
+    }
+}
+
+extension MainViewController: WeatherInfoDelegate {
+    func received(currentWeather: CurrentWeather) {
+        
+    }
+    
+    func receivedHourlyWeather(todaysWeather: [HourlyWeather]?, tomorrowsWeather: [HourlyWeather]?) {
+        
     }
 }
 

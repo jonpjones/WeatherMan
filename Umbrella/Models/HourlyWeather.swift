@@ -14,6 +14,7 @@ struct HourlyWeather {
     let tempF: String
     let timeString: String
     let timeSince1970: Double
-    let tintColor: UInt?
+    var tintColor: UInt?
     let isToday: Bool
+    let isTomorrow: Bool
 }

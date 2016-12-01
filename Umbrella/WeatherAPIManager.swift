@@ -39,12 +39,13 @@ class WeatherAPIManager {
                     guard let epoch = time?["epoch"] as? String else { return }
                     
                     let date = Date(timeIntervalSince1970: Double(epoch)!)
-                    let isToday = calendar.isDate(date, inSameDayAs: Date())
+                    let isToday = calendar.isDateInToday(date)
+                    let isTomorrow = calendar.isDateInTomorrow(date)
                     let tempC = (hour["temp"] as! [String: String])["metric"]!
                     let tempF = (hour["temp"] as! [String: String])["english"]!
                     let icon = hour["icon"] as? String ?? "clear"
 
-                    let hourlyWeather = HourlyWeather(iconName: icon, tempC: tempC, tempF: tempF, timeString: civilTime, timeSince1970: Double(epoch)!, tintColor: nil, isToday: isToday)
+                    let hourlyWeather = HourlyWeather(iconName: icon, tempC: tempC, tempF: tempF, timeString: civilTime, timeSince1970: Double(epoch)!, tintColor: nil, isToday: isToday, isTomorrow: isTomorrow)
                     
                     hourlyWeatherArray.append(hourlyWeather)
                 }

@@ -8,9 +8,9 @@
 
 import Foundation
 
- protocol WeatherInfoDelegate {
+protocol WeatherInfoDelegate {
     func received(currentWeather: CurrentWeather)
-    func receivedHourlyWeather(todaysWeather: [HourlyWeather]?, tomorrowsWeather: [HourlyWeather]?)
+    func receivedHourlyWeather(todaysWeather: [HourlyWeather]?, tomorrowsWeather: [HourlyWeather]?, twoDaysOut: [HourlyWeather]?)
 }
 
 let weatherInfo = WeatherInfoManager.sharedInstance
@@ -23,11 +23,53 @@ class WeatherInfoManager {
             return self.currentWeather
         }
         set {
-            self.delegate?.received(currentWeather: newValue)
+            self.delegate?.received(currentWeather: newValue!)
         }
     }
     
-    var hourlyWeather: [HourlyWeather]?
+    var hourlyWeather: [HourlyWeather]? {
+        get {
+            return self.hourlyWeather
+        }
+        set {
+            var todayHourlyArray: [HourlyWeather] = []
+            var tomorrowHourlyArray: [HourlyWeather] = []
+            var twoDaysHenceHourlyArray: [HourlyWeather] = []
+            for hour in newValue! {
+                hour.isToday ? todayHourlyArray.append(hour) : hour.isTomorrow ? tomorrowHourlyArray.append(hour) : twoDaysHenceHourlyArray.append(hour)
+            }
+            
+            
+           todayHourlyArray.sort {
+                return $0.tempF < $1.tempF
+            }
+            
+            if todayHourlyArray.count > 1 {
+                let count = todayHourlyArray.count
+                if todayHourlyArray.last!.tempF != todayHourlyArray[count - 2].tempF {
+                    todayHourlyArray[count - 1].tintColor = 0xFF9800
+                }
+                
+                if todayHourlyArray.first!.tempF != todayHourlyArray[1].tempF {
+                    todayHourlyArray[0].tintColor = 0x03A9F4
+                }
+            }
+            
+            todayHourlyArray.sort {
+                return $0.timeSince1970 < $1.timeSince1970
+            }
+            
+            tomorrowHourlyArray.sort {
+                return $0.timeSince1970 < $1.timeSince1970
+            }
+            
+            print(tomorrowHourlyArray)
+        }
+    }
+    
+    func addTintColorsToMaxAndMin(hourly: [HourlyWeather]) -> [HourlyWeather] {
+        
+    }
     
     
 }
