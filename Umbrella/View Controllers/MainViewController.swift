@@ -79,7 +79,7 @@ class MainViewController: UIViewController {
 extension MainViewController: SettingsViewControllerDelegate {
     func preferredTemperatureStyleChanged() {
         let currentTemp = currentSettings.fahrenheight ? weatherInfo.currentWeather?.tempF : weatherInfo.currentWeather?.tempC
-        currentTempLabel.text = "\(currentTemp)˚"
+        currentTempLabel.text = "\(currentTemp!)˚"
         collectionView.reloadData()
     }
 }

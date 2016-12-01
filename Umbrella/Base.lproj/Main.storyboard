@@ -210,14 +210,30 @@
                                 </view>
                                 <blurEffect style="dark"/>
                             </visualEffectView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nk9-rc-H9U">
-                                <frame key="frameInset" minX="46" minY="152" width="282" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nk9-rc-H9U">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="Ib8-LH-LUF"/>
+                                    <constraint firstAttribute="height" constant="30" id="JM8-qb-TLc"/>
+                                </constraints>
                                 <state key="normal" title="Get The Weather"/>
                                 <connections>
+                                    <action selector="getTheWeatherButtonTapped:" destination="YI1-vi-hdI" eventType="touchUpInside" id="fmE-me-9Ra"/>
                                     <segue destination="5HP-Li-T4U" kind="unwind" unwindAction="returnFromSettingsSegue:" id="Ts3-je-bNi"/>
                                 </connections>
                             </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="elR-Kz-Jxl">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="28" id="CGG-TS-blo"/>
+                                    <constraint firstAttribute="width" constant="225" id="pwD-2M-rCw"/>
+                                </constraints>
+                                <segments>
+                                    <segment title="Fahrenheit"/>
+                                    <segment title="Celcius"/>
+                                </segments>
+                                <connections>
+                                    <action selector="segmentedControlValueChanged:" destination="YI1-vi-hdI" eventType="valueChanged" id="0BX-Uf-pdP"/>
+                                </connections>
+                            </segmentedControl>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter Zip Code" textAlignment="natural" minimumFontSize="17" background="searchGlass" translatesAutoresizingMaskIntoConstraints="NO" id="FjN-dh-ioe">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="CZt-f1-rlb"/>
@@ -226,29 +242,25 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="elR-Kz-Jxl">
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="225" id="NqW-Wq-aFZ"/>
-                                    <constraint firstAttribute="height" constant="28" id="knP-XE-ayV"/>
-                                </constraints>
-                                <segments>
-                                    <segment title="Fahrenheit"/>
-                                    <segment title="Celcius"/>
-                                </segments>
-                            </segmentedControl>
                         </subviews>
                         <constraints>
                             <constraint firstItem="FjN-dh-ioe" firstAttribute="leading" secondItem="ZNF-zW-a6M" secondAttribute="leading" constant="15" id="0xL-NT-f3s"/>
+                            <constraint firstItem="elR-Kz-Jxl" firstAttribute="top" secondItem="FjN-dh-ioe" secondAttribute="bottom" constant="25" id="8dZ-p0-tpN"/>
+                            <constraint firstItem="nk9-rc-H9U" firstAttribute="top" secondItem="elR-Kz-Jxl" secondAttribute="bottom" constant="25" id="MKn-5d-ya2"/>
+                            <constraint firstItem="nk9-rc-H9U" firstAttribute="centerX" secondItem="ZNF-zW-a6M" secondAttribute="centerX" id="Oua-wi-w7W"/>
                             <constraint firstItem="x7e-H3-qvL" firstAttribute="top" secondItem="ZNF-zW-a6M" secondAttribute="top" id="Ppr-iN-oPh"/>
                             <constraint firstItem="FjN-dh-ioe" firstAttribute="top" secondItem="ZNF-zW-a6M" secondAttribute="top" constant="45" id="SN6-Bi-Ytb"/>
                             <constraint firstAttribute="trailing" secondItem="x7e-H3-qvL" secondAttribute="trailing" id="Yxy-aE-Y29"/>
                             <constraint firstAttribute="trailing" secondItem="FjN-dh-ioe" secondAttribute="trailing" constant="15" id="glD-QG-b68"/>
                             <constraint firstItem="Wyu-8R-YGN" firstAttribute="top" secondItem="x7e-H3-qvL" secondAttribute="bottom" id="nPn-La-zMS"/>
-                            <constraint firstItem="elR-Kz-Jxl" firstAttribute="centerX" secondItem="ZNF-zW-a6M" secondAttribute="centerX" id="nT9-hL-cwY"/>
-                            <constraint firstItem="elR-Kz-Jxl" firstAttribute="top" secondItem="FjN-dh-ioe" secondAttribute="bottom" constant="25" id="qHm-x7-P1g"/>
                             <constraint firstItem="x7e-H3-qvL" firstAttribute="leading" secondItem="ZNF-zW-a6M" secondAttribute="leading" id="rnI-gh-1MC"/>
+                            <constraint firstItem="elR-Kz-Jxl" firstAttribute="centerX" secondItem="ZNF-zW-a6M" secondAttribute="centerX" id="ynC-UW-cD6"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="getWeatherButton" destination="nk9-rc-H9U" id="aga-ra-PKt"/>
+                        <outlet property="temperatureSegmentedControl" destination="elR-Kz-Jxl" id="xtF-Ln-ZHV"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9pf-OA-xHL" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="5HP-Li-T4U" userLabel="Exit" sceneMemberID="exit"/>

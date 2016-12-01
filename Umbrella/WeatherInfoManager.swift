@@ -25,11 +25,13 @@ class WeatherInfoManager {
 
     var delegate: WeatherInfoDelegate?
     
+    private var currentWeatherPrivate: CurrentWeather?
     var currentWeather: CurrentWeather? {
         get {
-            return self.currentWeather
+            return currentWeatherPrivate
         }
         set {
+            currentWeatherPrivate = newValue!
             self.delegate?.received(currentWeather: newValue!)
         }
     }
