@@ -25,13 +25,13 @@
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="npG-sO-eSE">
                                     <size key="itemSize" width="108" height="101"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="headerReferenceSize" width="50" height="50"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="HourlyCellID" id="lZX-Dn-pmD" customClass="HourlyWeatherCollectionViewCell" customModule="Umbrella" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="108" height="101"/>
+                                        <rect key="frame" x="0.0" y="50" width="108" height="101"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="108" height="101"/>
@@ -78,6 +78,49 @@
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
+                                <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="HeaderID" id="qmd-zb-LdB" customClass="DayHeaderView" customModule="Umbrella" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GJO-C1-NaS">
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ieZ-mi-sKT">
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sRS-aw-QpA">
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="trailing" secondItem="sRS-aw-QpA" secondAttribute="trailing" id="1sy-bb-LsK"/>
+                                                        <constraint firstItem="sRS-aw-QpA" firstAttribute="leading" secondItem="ieZ-mi-sKT" secondAttribute="leading" constant="20" id="LCO-G4-v1q"/>
+                                                        <constraint firstAttribute="bottom" secondItem="sRS-aw-QpA" secondAttribute="bottom" id="QK2-QQ-MPq"/>
+                                                        <constraint firstItem="sRS-aw-QpA" firstAttribute="top" secondItem="ieZ-mi-sKT" secondAttribute="top" id="x3X-zb-sKr"/>
+                                                    </constraints>
+                                                </view>
+                                            </subviews>
+                                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="ieZ-mi-sKT" firstAttribute="top" secondItem="GJO-C1-NaS" secondAttribute="top" constant="2" id="WVo-cH-3bl"/>
+                                                <constraint firstItem="ieZ-mi-sKT" firstAttribute="leading" secondItem="GJO-C1-NaS" secondAttribute="leading" id="bNz-8J-WpG"/>
+                                                <constraint firstAttribute="bottom" secondItem="ieZ-mi-sKT" secondAttribute="bottom" constant="1" id="juN-tk-aFY"/>
+                                                <constraint firstAttribute="trailing" secondItem="ieZ-mi-sKT" secondAttribute="trailing" id="nX4-LJ-Z8Z"/>
+                                            </constraints>
+                                        </view>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="GJO-C1-NaS" firstAttribute="top" secondItem="qmd-zb-LdB" secondAttribute="top" id="3g1-CE-SOU"/>
+                                        <constraint firstAttribute="trailing" secondItem="GJO-C1-NaS" secondAttribute="trailing" id="Ldx-Ah-Rwt"/>
+                                        <constraint firstAttribute="bottom" secondItem="GJO-C1-NaS" secondAttribute="bottom" id="LhA-PG-7W9"/>
+                                        <constraint firstItem="GJO-C1-NaS" firstAttribute="leading" secondItem="qmd-zb-LdB" secondAttribute="leading" id="Qll-Yh-KIx"/>
+                                    </constraints>
+                                    <connections>
+                                        <outlet property="backgroundView" destination="GJO-C1-NaS" id="9Hk-Gr-MZv"/>
+                                        <outlet property="headerLabel" destination="sRS-aw-QpA" id="pmO-tY-4ib"/>
+                                    </connections>
+                                </collectionReusableView>
                                 <connections>
                                     <outlet property="dataSource" destination="BYZ-38-t0r" id="kSw-0e-Ww5"/>
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="oBP-OB-sOZ"/>

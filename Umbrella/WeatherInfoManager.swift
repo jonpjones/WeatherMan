@@ -12,7 +12,7 @@ import UIKit
 protocol WeatherInfoDelegate {
     func received(currentWeather: CurrentWeather)
     func receivedHourlyWeather(forDays: [[HourlyWeather]])
-    func receivedIcon(name: String, state: String)
+    func receivedIcon(name: String, solid: Bool)
 }
 
 
@@ -21,15 +21,7 @@ class WeatherInfoManager {
     fileprivate static let sharedInstance = WeatherInfoManager()
     var outlineIconNameSet: Set<String> = []
     var solidIconNameSet: Set<String> = []
-    var weatherIconDictionary: [String: [String:UIImage]]? {
-        get {
-            return self.weatherIconDictionary
-        }
-        set {
-            
-        }
-    }
-    
+    var weatherIconDictionary: [String: [String:UIImage]] = [:]
 
     var delegate: WeatherInfoDelegate?
     
@@ -114,7 +106,7 @@ class WeatherInfoManager {
 
 //MARK: - WeatherAPIManagerDelegate
 extension WeatherInfoManager: WeatherAPIManagerDelegate {
-    func receivedIconInfo(name: String, state: String) {
-        delegate?.receivedIcon(name: name, state: state)
+    func receivedIconInfo(name: String, solid: Bool) {
+        delegate?.receivedIcon(name: name, solid: solid)
     }
 }

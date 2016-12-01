@@ -71,8 +71,19 @@ extension MainViewController: WeatherInfoDelegate {
         collectionView.reloadData()
     }
     
-    func receivedIcon(name: String, state: String) {
-        
+    func receivedIcon(name: String, solid: Bool) {
+        var indexPathsToUpdate: [IndexPath] = []
+        guard daysHourlyWeatherArray != nil else { return }
+        for section in 0 ..< daysHourlyWeatherArray!.count {
+            for item in 0 ..< daysHourlyWeatherArray![section].count {
+                let hour = daysHourlyWeatherArray![section][item]
+                if hour.iconName == name && (hour.tintColor != nil) == solid {
+                    let indexPath = IndexPath(item: item, section: section)
+                    indexPathsToUpdate.append(indexPath)
+                }
+            }
+        }
+        collectionView.reloadItems(at: indexPathsToUpdate)
     }
     
     
@@ -97,16 +108,37 @@ extension MainViewController: UICollectionViewDataSource {
         let hour = day?[indexPath.item]
         
         cell.timeLabel.text = hour?.timeString
-        cell.tempLabel.text = currentSettings.fahrenheight ? hour?.tempF : hour?.tempC
+        cell.tempLabel.text = currentSettings.fahrenheight ? hour!.tempF + "˚" : hour!.tempC + "˚"
         cell.tint = hour?.tintColor
+        
+        if let iconDict = weatherInfo.weatherIconDictionary[(hour?.iconName)!] {
+            let state = hour?.tintColor != nil ? "solid" : "outline"
+            if let image = iconDict[state]?.withRenderingMode(.alwaysTemplate) {
+                cell.iconImageView.image = image
+                let tintColor = cell.tint != nil ? UIColor(cell.tint!) : .black
+                cell.iconImageView.tintColor = tintColor
+            }
+        }
         
         return cell
     }
-    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionElementKindSectionHeader {
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "HeaderID", for: indexPath) as! DayHeaderView
+            var dayString = ""
+            switch indexPath.section {
+            case 0: dayString = "Today"
+            case 1: dayString = "Tomorrow"
+            case 2: dayString = "Two Days From Now"
+            default: break
+            }
+            header.headerLabel.text = dayString
+            return header
+        }
         return UICollectionReusableView()
     }
 }
+
 //MARK: - UICollectionViewDelegateFlowLayout
 extension MainViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

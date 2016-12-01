@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 protocol WeatherAPIManagerDelegate {
-    func receivedIconInfo(name: String, state: String)
+    func receivedIconInfo(name: String, solid: Bool)
 }
 class WeatherAPIManager {
     static let sharedInstance = WeatherAPIManager()
@@ -73,10 +73,12 @@ class WeatherAPIManager {
             guard error == nil else { return }
             if let image = UIImage(data: data!) {
                 DispatchQueue.main.async {
-                    var iconDictionary = weatherInfo.weatherIconDictionary?[name]
+                    var iconDictionary: [String: UIImage] = weatherInfo.weatherIconDictionary[name] ?? [:]
                     let iconState = solid ? "solid" : "outline"
-                    iconDictionary?[iconState] = image
-                    self.delegate.receivedIconInfo(name: name, state: iconState)
+                    iconDictionary[iconState] = image
+                    weatherInfo.weatherIconDictionary[name] = iconDictionary
+                    print(weatherInfo.weatherIconDictionary)
+                    self.delegate.receivedIconInfo(name: name, solid: solid)
                 }
             }
         }.resume()

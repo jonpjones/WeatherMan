@@ -20,6 +20,8 @@ class HourlyWeatherCollectionViewCell: UICollectionViewCell {
         let tintColor = tint != nil ? UIColor(tint!) : .black
         timeLabel.textColor = tintColor
         tempLabel.textColor = tintColor
-        iconImageView.tintColor = tintColor
+        
+        
+
     }
 }

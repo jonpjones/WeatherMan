@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1328FD7A1DF0BA610013EA27 /* DayHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1328FD791DF0BA610013EA27 /* DayHeaderView.swift */; };
 		1371172B1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */; };
 		13FC691B1DECFA3C004F28D7 /* WeatherAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */; };
 		13FC691E1DEF27F3004F28D7 /* CurrentWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */; };
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1328FD791DF0BA610013EA27 /* DayHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DayHeaderView.swift; sourceTree = "<group>"; };
 		1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HourlyWeatherCollectionViewCell.swift; sourceTree = "<group>"; };
 		13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherAPIManager.swift; sourceTree = "<group>"; };
 		13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentWeather.swift; sourceTree = "<group>"; };
@@ -85,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */,
+				1328FD791DF0BA610013EA27 /* DayHeaderView.swift */,
 			);
 			name = "Model Views";
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 				44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */,
 				44DE82D91BCDF4C500A319D2 /* MainViewController.swift in Sources */,
 				44DE82B41BCDF45900A319D2 /* AppDelegate.swift in Sources */,
+				1328FD7A1DF0BA610013EA27 /* DayHeaderView.swift in Sources */,
 				13FC691B1DECFA3C004F28D7 /* WeatherAPIManager.swift in Sources */,
 				44DE82D71BCDF4BA00A319D2 /* SettingsViewController.swift in Sources */,
 			);
