@@ -12,6 +12,7 @@ import UIKit
 protocol WeatherInfoDelegate {
     func received(currentWeather: CurrentWeather)
     func receivedHourlyWeather(forDays: [[HourlyWeather]])
+    func receivedIcon(name: String, state: String)
 }
 
 
@@ -20,7 +21,15 @@ class WeatherInfoManager {
     fileprivate static let sharedInstance = WeatherInfoManager()
     var outlineIconNameSet: Set<String> = []
     var solidIconNameSet: Set<String> = []
-    var weatherIconDictionary: [String: [String:UIImage]]?
+    var weatherIconDictionary: [String: [String:UIImage]]? {
+        get {
+            return self.weatherIconDictionary
+        }
+        set {
+            
+        }
+    }
+    
 
     var delegate: WeatherInfoDelegate?
     
@@ -49,6 +58,7 @@ class WeatherInfoManager {
             let tomorrowHourlySorted = addTintColorsToMaxAndMin(hourly: tomorrowHourlyArray)
             let twoDaysHourlySorted = addTintColorsToMaxAndMin(hourly: twoDaysHenceHourlyArray)
             
+            getIconsFromNerdery()
             delegate?.receivedHourlyWeather(forDays: [todayHourlySorted, tomorrowHourlySorted, twoDaysHourlySorted])
         }
     }
@@ -92,5 +102,19 @@ class WeatherInfoManager {
         return hourlySorted
     }
     
-    
+    func getIconsFromNerdery() {
+        for icon in solidIconNameSet {
+            WeatherAPIManager.sharedInstance.fetchIcon(name: icon, solid: true)
+        }
+        for icon in outlineIconNameSet {
+            WeatherAPIManager.sharedInstance.fetchIcon(name: icon, solid: false)
+        }
+    }
+}
+
+//MARK: - WeatherAPIManagerDelegate
+extension WeatherInfoManager: WeatherAPIManagerDelegate {
+    func receivedIconInfo(name: String, state: String) {
+        delegate?.receivedIcon(name: name, state: state)
+    }
 }

@@ -8,9 +8,14 @@
 
 import Foundation
 import UIKit
+
+protocol WeatherAPIManagerDelegate {
+    func receivedIconInfo(name: String, state: String)
+}
 class WeatherAPIManager {
     static let sharedInstance = WeatherAPIManager()
-   
+    var delegate: WeatherAPIManagerDelegate = weatherInfo
+    
     func fetchHourlyForecast(fromURL: URL) {
         URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
             
@@ -62,7 +67,18 @@ class WeatherAPIManager {
     }
     
     func fetchIcon(name: String, solid: Bool) {
- 
+        let iconURL = name.nrd_weatherIconURL(highlighted: solid)
         
+        URLSession.shared.dataTask(with: iconURL!) { (data, response, error) in
+            guard error == nil else { return }
+            if let image = UIImage(data: data!) {
+                DispatchQueue.main.async {
+                    var iconDictionary = weatherInfo.weatherIconDictionary?[name]
+                    let iconState = solid ? "solid" : "outline"
+                    iconDictionary?[iconState] = image
+                    self.delegate.receivedIconInfo(name: name, state: iconState)
+                }
+            }
+        }.resume()
     }
 }

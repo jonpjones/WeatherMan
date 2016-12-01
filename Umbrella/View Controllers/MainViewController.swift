@@ -70,6 +70,12 @@ extension MainViewController: WeatherInfoDelegate {
         daysHourlyWeatherArray = forDays
         collectionView.reloadData()
     }
+    
+    func receivedIcon(name: String, state: String) {
+        
+    }
+    
+    
    
 }
 
