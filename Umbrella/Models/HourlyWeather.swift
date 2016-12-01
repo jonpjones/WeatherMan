@@ -10,10 +10,10 @@ import Foundation
 
 struct HourlyWeather {
     let iconName: String
-    let temp: Int
+    let tempC: String
+    let tempF: String
     let timeString: String
     let timeSince1970: Double
     let tintColor: UInt?
     let isToday: Bool
-    
 }

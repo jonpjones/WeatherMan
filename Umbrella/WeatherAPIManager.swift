@@ -30,40 +30,32 @@ class WeatherAPIManager {
                 
                 let calendar = Calendar(identifier: .gregorian)
 
+                var hourlyWeatherArray: [HourlyWeather] = []
                 
                 for hour in hourlyForecast {
-                    let civilTime = hour["hourly_forecast"] as? [String: Any]
-                    guard let epoch = hour["epoch"] as? Double else { return }
-                    let date = Date(timeIntervalSince1970: epoch)
-                    let isToday = calendar.isDate(date, inSameDayAs: Date())
-                    let tempC = (hour["temp"] as! [String: Double])["metric"]
-                    let tempF = (hour["temp"] as! [String: Double])["english"]
-                    let icon = hour["icon"] as? String
+                    let time = hour["FCTTIME"] as? [String: Any]
                     
+                    guard let civilTime = time?["civil"] as? String else { return }
+                    guard let epoch = time?["epoch"] as? String else { return }
+                    
+                    let date = Date(timeIntervalSince1970: Double(epoch)!)
+                    let isToday = calendar.isDate(date, inSameDayAs: Date())
+                    let tempC = (hour["temp"] as! [String: String])["metric"]!
+                    let tempF = (hour["temp"] as! [String: String])["english"]!
+                    let icon = hour["icon"] as? String ?? "clear"
+
+                    let hourlyWeather = HourlyWeather(iconName: icon, tempC: tempC, tempF: tempF, timeString: civilTime, timeSince1970: Double(epoch)!, tintColor: nil, isToday: isToday)
+                    
+                    hourlyWeatherArray.append(hourlyWeather)
                 }
                 
-                
-                
-                
-                
-                
-                // Current Conditions
-                // City         : current_observation.display_location.full
-                // Temp         : current_observation.(temp_f || temp_c)
-                // Condition    : current_observation.weather
-                
-                // Hourly information
-                // Timestamp    : hourly_forecast.FCTTIME.(civil = string representation, epoch = date from 1970)
-                // Icon         : hourly_forecast.icon
-                // Temp         : hourly_forecast.temp.(english || metric)
-
+                DispatchQueue.main.async {
+                    weatherInfo.currentWeather = currentWeather
+                    weatherInfo.hourlyWeather = hourlyWeatherArray
+                }
             } catch {
                 print("Not convertable")
             }
-            
         }.resume()
-        
     }
-    
-    
 }
