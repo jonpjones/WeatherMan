@@ -15,7 +15,6 @@ protocol WeatherInfoDelegate {
     func receivedIcon(name: String, solid: Bool)
 }
 
-
 let weatherInfo = WeatherInfoManager.sharedInstance
 class WeatherInfoManager {
     fileprivate static let sharedInstance = WeatherInfoManager()

@@ -16,7 +16,7 @@ class WeatherAPIManager {
     static let sharedInstance = WeatherAPIManager()
     var delegate: WeatherAPIManagerDelegate = weatherInfo
     
-    func fetchHourlyForecast(fromURL: URL) {
+    func fetchHourlyForecast(fromURL: URL, completion: @escaping (Bool) -> ()) {
         URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
             
             guard error == nil else { print(error); return }

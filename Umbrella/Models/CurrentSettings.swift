@@ -8,8 +8,9 @@
 
 import Foundation
 
-let currentSettings = CurrentSettings()
+let currentSettings = CurrentSettings.sharedInstance
 class CurrentSettings {
-    var zip: Int?
+    static let sharedInstance = CurrentSettings()
+    var zip: String = "60647"
     var fahrenheight: Bool = true
 }

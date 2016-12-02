@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+let apiKey = "833018b6135efd73"
 class MainViewController: UIViewController {
     
     @IBOutlet weak var currentLocationLabel: UILabel!
@@ -23,16 +23,12 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         weatherInfo.delegate = self
-        // Setup the request
-        var weatherRequest = WeatherRequest(APIKey: "833018b6135efd73")
-        
-        // Set the zip code
-        weatherRequest.zipCode = "60647"
-        
-        // Here's your URL. Marshall this to the internet however you please.
+        var weatherRequest = WeatherRequest(APIKey: apiKey)
+        weatherRequest.zipCode = currentSettings.zip
         let url = weatherRequest.URL
-        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: url!)
-        
+        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: url!) { (success) in
+            
+        }
 
 
         // Do any additional setup after loading the view.
@@ -44,12 +40,12 @@ class MainViewController: UIViewController {
     }
     
     // MARK: - Navigation
-    
-    @IBAction func returnFromSettingsSegue(_: UIStoryboardSegue) {
-        
+  
+    @IBAction func settingsButtonTapped(_ sender: UIButton) {
+        popOverToSettings(source: sender)
     }
     
-    @IBAction func settingsButtonTapped(_ sender: UIButton) {
+    func popOverToSettings(source: UIView) {
         let settingsViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "settingsID") as! SettingsViewController
         self.definesPresentationContext = true
         self.modalPresentationStyle = .currentContext
@@ -57,20 +53,18 @@ class MainViewController: UIViewController {
         
         settingsViewController.modalPresentationStyle = .overCurrentContext
         settingsViewController.popoverPresentationController?.delegate = self
-        settingsViewController.popoverPresentationController?.sourceRect = sender.frame
-        settingsViewController.popoverPresentationController?.sourceView = sender
+        settingsViewController.popoverPresentationController?.sourceRect = source.frame
+        settingsViewController.popoverPresentationController?.sourceView = source
         settingsViewController.popoverPresentationController?.canOverlapSourceViewRect = true
         settingsViewController.preferredContentSize = view.frame.size
         
         self.present(settingsViewController, animated: true, completion: nil)
+
     }
     
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        
         // Set the popover presentation style delegate to always force a popover
-        
         
         //I found that when forcing the segue to be a popover using the presentation style delegate, the subviews beneath popover were removed, leaving a generally uninteresting and blank area beneath the blurred background of the settings controller. Since the sample designs look like the settings view controller cover the screen, I think that a vertical modal presentation is appropriate - and also the only modal presentation style that supports being presented over the current context.
     }
@@ -79,7 +73,8 @@ class MainViewController: UIViewController {
 extension MainViewController: SettingsViewControllerDelegate {
     func preferredTemperatureStyleChanged() {
         let currentTemp = currentSettings.fahrenheight ? weatherInfo.currentWeather?.tempF : weatherInfo.currentWeather?.tempC
-        currentTempLabel.text = "\(currentTemp!)˚"
+        
+        currentTempLabel.text = "\(currentTemp ?? 0)˚"
         collectionView.reloadData()
     }
 }
