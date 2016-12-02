@@ -76,9 +76,7 @@ class SettingsViewController: UIViewController {
                     self.presentingViewController?.dismiss(animated: true, completion: nil)
                 }
             })
-        }
-        
-        
+        }  
     }
 }
 

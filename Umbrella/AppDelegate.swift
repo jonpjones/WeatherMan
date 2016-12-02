@@ -48,7 +48,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var request = WeatherRequest(APIKey: apiKey)
         request.zipCode = CurrentSettings.sharedInstance.zip
         WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: request.URL!) { (success) in
-            
+            guard success else {
+                let window = UIApplication.shared.keyWindow
+                let presentedVC = window?.visibleViewController()
+                presentedVC?.presentErrorAlert()
+                return
+            }
         }
     }
 }

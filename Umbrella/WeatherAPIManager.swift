@@ -19,11 +19,12 @@ class WeatherAPIManager {
     func fetchHourlyForecast(fromURL: URL, completion: @escaping (Bool) -> ()) {
         URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
             
-            guard error == nil else { print(error); return }
+            guard error == nil else {  completion(false); return  }
             do {
                 let weatherJSON = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
                 
-                guard let currentObservation = weatherJSON?["current_observation"] as? [String: Any] else { return }
+                guard let currentObservation = weatherJSON?["current_observation"] as? [String: Any] else { completion(false); return }
+                
                 let locationName = (currentObservation["observation_location"] as? [String: String])?["full"] ?? "Unknown Location"
                 
                 let tempF = currentObservation["temp_f"] as! Double
@@ -32,7 +33,7 @@ class WeatherAPIManager {
                 
                 let currentWeather = CurrentWeather(withLocation: locationName, tempC: Int(tempC.rounded()), tempF: Int(tempF.rounded()), conditions: conditions)
                 
-                guard let hourlyForecast = weatherJSON?["hourly_forecast"] as? [[String: Any]] else {return}
+                guard let hourlyForecast = weatherJSON?["hourly_forecast"] as? [[String: Any]] else { completion(false); return }
                 
                 let calendar = Calendar(identifier: .gregorian)
 
@@ -41,8 +42,8 @@ class WeatherAPIManager {
                 for hour in hourlyForecast {
                     let time = hour["FCTTIME"] as? [String: Any]
                     
-                    guard let civilTime = time?["civil"] as? String else { return }
-                    guard let epoch = time?["epoch"] as? String else { return }
+                    guard let civilTime = time?["civil"] as? String else {  completion(false); return  }
+                    guard let epoch = time?["epoch"] as? String else {  completion(false); return  }
                     
                     let date = Date(timeIntervalSince1970: Double(epoch)!)
                     let isToday = calendar.isDateInToday(date)
@@ -59,9 +60,10 @@ class WeatherAPIManager {
                 DispatchQueue.main.async {
                     weatherInfo.currentWeather = currentWeather
                     weatherInfo.hourlyWeather = hourlyWeatherArray
+                    completion(true)
                 }
             } catch {
-                print("Not convertable")
+                completion(false)
             }
         }.resume()
     }
@@ -77,7 +79,6 @@ class WeatherAPIManager {
                     let iconState = solid ? "solid" : "outline"
                     iconDictionary[iconState] = image
                     weatherInfo.weatherIconDictionary[name] = iconDictionary
-                    print(weatherInfo.weatherIconDictionary)
                     self.delegate.receivedIconInfo(name: name, solid: solid)
                 }
             }

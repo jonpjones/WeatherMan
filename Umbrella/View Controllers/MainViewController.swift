@@ -27,7 +27,10 @@ class MainViewController: UIViewController {
         weatherRequest.zipCode = currentSettings.zip
         let url = weatherRequest.URL
         WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: url!) { (success) in
-            
+            guard success else {
+                self.presentErrorAlert()
+                return
+            }
         }
 
 
