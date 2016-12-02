@@ -13,7 +13,7 @@ class MainViewController: UIViewController {
     @IBOutlet weak var currentLocationLabel: UILabel!
     @IBOutlet weak var currentTempLabel: UILabel!
     @IBOutlet weak var currentConditionsLabel: UILabel!
-    
+    @IBOutlet weak var currentWeatherBGView: UIView!
     
     
     var daysHourlyWeatherArray: [[HourlyWeather]]?
@@ -32,14 +32,14 @@ class MainViewController: UIViewController {
                 return
             }
         }
-
-
-        // Do any additional setup after loading the view.
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        if UIDevice.current.orientation.isLandscape {
+            currentLocationLabel.textAlignment = .center
+        } else {
+            currentLocationLabel.textAlignment = .left
+        }
     }
     
     // MARK: - Navigation
@@ -60,7 +60,6 @@ class MainViewController: UIViewController {
         settingsViewController.popoverPresentationController?.sourceView = source
         settingsViewController.popoverPresentationController?.canOverlapSourceViewRect = true
         settingsViewController.preferredContentSize = view.frame.size
-        
         self.present(settingsViewController, animated: true, completion: nil)
 
     }
@@ -92,7 +91,7 @@ extension MainViewController: UIPopoverPresentationControllerDelegate {
 extension MainViewController: WeatherInfoDelegate {
     func received(currentWeather: CurrentWeather) {
         let currentTemp = currentSettings.fahrenheight ? currentWeather.tempF : currentWeather.tempC
-        view.backgroundColor = currentWeather.tempF > 60 ? UIColor(0xFF9800) : UIColor(0x03A9F4)
+        currentWeatherBGView.backgroundColor = currentWeather.tempF > 60 ? UIColor(0xFF9800) : UIColor(0x03A9F4)
         currentTempLabel.text = "\(currentTemp)˚"
         currentLocationLabel.text = currentWeather.fullLocation
         currentConditionsLabel.text = currentWeather.conditions

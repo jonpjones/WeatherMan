@@ -31,7 +31,6 @@ struct WeatherRequest {
             urlComponents.path = "/api/\(APIKey)/conditions/hourly/q/\(zip).json"
             
             return urlComponents.url
-            
         }
     }
     

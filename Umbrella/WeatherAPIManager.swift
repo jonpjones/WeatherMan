@@ -16,6 +16,7 @@ class WeatherAPIManager {
     static let sharedInstance = WeatherAPIManager()
     var delegate: WeatherAPIManagerDelegate = weatherInfo
     
+    
     func fetchHourlyForecast(fromURL: URL, completion: @escaping (Bool) -> ()) {
         URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
             
@@ -70,7 +71,6 @@ class WeatherAPIManager {
     
     func fetchIcon(name: String, solid: Bool) {
         let iconURL = name.nrd_weatherIconURL(highlighted: solid)
-        
         URLSession.shared.dataTask(with: iconURL!) { (data, response, error) in
             guard error == nil else { return }
             if let image = UIImage(data: data!) {
