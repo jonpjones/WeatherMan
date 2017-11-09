@@ -15,25 +15,31 @@ class MainViewController: UIViewController {
     @IBOutlet weak var currentConditionsLabel: UILabel!
     @IBOutlet weak var currentWeatherBGView: UIView!
     
+    @IBOutlet var currentLocationLabelBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var currentWeatherBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var currentTempHeight: NSLayoutConstraint!
     
+    var blurView: UIVisualEffectView?
     var daysHourlyWeatherArray: [[HourlyWeather]]?
+    let transition = TableViewTransitioner()
     
     @IBOutlet weak var collectionView: UICollectionView!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         weatherInfo.delegate = self
-        var weatherRequest = WeatherRequest(APIKey: apiKey)
-        weatherRequest.zipCode = currentSettings.zip
-        let url = weatherRequest.URL
-        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: url!) { (success) in
-            guard success else {
-                self.presentErrorAlert()
-                return
-            }
-        }
+//        var weatherRequest = WeatherRequest(APIKey: apiKey)
+//        weatherRequest.zipCode = currentSettings.zip
+//        let url = weatherRequest.URL
+//        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: url!) { (success) in
+//            guard success else {
+//                self.presentErrorAlert()
+//                return
+//            }
+//        }
     }
-
+    
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         if UIDevice.current.orientation.isLandscape {
             currentLocationLabel.textAlignment = .center
@@ -43,8 +49,10 @@ class MainViewController: UIViewController {
     }
     
     // MARK: - Navigation
-  
+    
     @IBAction func settingsButtonTapped(_ sender: UIButton) {
+        blurView = UIVisualEffectView(frame: self.view.frame)
+        
         popOverToSettings(source: sender)
     }
     
@@ -61,14 +69,6 @@ class MainViewController: UIViewController {
         settingsViewController.popoverPresentationController?.canOverlapSourceViewRect = true
         settingsViewController.preferredContentSize = view.frame.size
         self.present(settingsViewController, animated: true, completion: nil)
-
-    }
-    
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Set the popover presentation style delegate to always force a popover
-        
-        //I found that when forcing the segue to be a popover using the presentation style delegate, the subviews beneath popover were removed, leaving a generally uninteresting and blank area beneath the blurred background of the settings controller. Since the sample designs look like the settings view controller cover the screen, I think that a vertical modal presentation is appropriate - and also the only modal presentation style that supports being presented over the current context.
     }
 }
 
@@ -77,7 +77,7 @@ extension MainViewController: SettingsViewControllerDelegate {
         let currentTemp = currentSettings.fahrenheight ? weatherInfo.currentWeather?.tempF : weatherInfo.currentWeather?.tempC
         
         currentTempLabel.text = "\(currentTemp ?? 0)˚"
-        collectionView.reloadData()
+       // collectionView.reloadData()
     }
 }
 
@@ -108,21 +108,21 @@ extension MainViewController: WeatherInfoDelegate {
         for section in 0 ..< daysHourlyWeatherArray!.count {
             for item in 0 ..< daysHourlyWeatherArray![section].count {
                 let hour = daysHourlyWeatherArray![section][item]
+               
                 if hour.iconName == name && (hour.tintColor != nil) == solid {
                     let indexPath = IndexPath(item: item, section: section)
                     indexPathsToUpdate.append(indexPath)
                 }
             }
         }
-        collectionView.reloadItems(at: indexPathsToUpdate)
+        collectionView.reloadData()
+      //  collectionView.reloadItems(at: indexPathsToUpdate)
     }
-    
-    
-   
 }
 
 // MARK: - UICollectionViewDataSource
 extension MainViewController: UICollectionViewDataSource {
+    
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return daysHourlyWeatherArray?.count ?? 0
@@ -132,12 +132,17 @@ extension MainViewController: UICollectionViewDataSource {
         let day = daysHourlyWeatherArray?[section]
         return day?.count ?? 0
     }
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        UIView.animate(withDuration: 0.3) {
+            cell.transform = .identity
+        }
+    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HourlyCellID", for: indexPath) as! HourlyWeatherCollectionViewCell
         let day = daysHourlyWeatherArray?[indexPath.section]
         let hour = day?[indexPath.item]
-        
+        cell.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
         cell.timeLabel.text = hour?.timeString
         cell.tempLabel.text = currentSettings.fahrenheight ? hour!.tempF + "˚" : hour!.tempC + "˚"
         cell.tint = hour?.tintColor
@@ -146,13 +151,12 @@ extension MainViewController: UICollectionViewDataSource {
             let state = hour?.tintColor != nil ? "solid" : "outline"
             if let image = iconDict[state]?.withRenderingMode(.alwaysTemplate) {
                 cell.iconImageView.image = image
-                let tintColor = cell.tint != nil ? UIColor(cell.tint!) : .black
-                cell.iconImageView.tintColor = tintColor
             }
         }
         
         return cell
     }
+    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionElementKindSectionHeader {
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "HeaderID", for: indexPath) as! DayHeaderView
@@ -168,10 +172,56 @@ extension MainViewController: UICollectionViewDataSource {
         }
         return UICollectionReusableView()
     }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y < 0  {
+            let scrolledPastThreshold = 60 - scrollView.contentOffset.y
+            if !(UIDevice.current.orientation == UIDeviceOrientation.landscapeLeft ||
+                UIDevice.current.orientation == UIDeviceOrientation.landscapeRight) {
+                currentLocationLabelBottomConstraint.constant = (scrolledPastThreshold) > 90 ? 5 - ((30 + scrollView.contentOffset.y) / 2) : 5
+            }
+            currentTempHeight.constant = min(scrolledPastThreshold, 90)
+            currentWeatherBottomConstraint.constant = scrollView.contentOffset.y
+            currentTempLabel.font = UIFont(name: currentTempLabel.font.fontName, size: min(scrolledPastThreshold, 90))
+            UIView.animate(withDuration: 0, animations: {
+                self.view.layoutIfNeeded()
+            })
+        }
+    }
+}
+
+extension MainViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? HourlyWeatherCollectionViewCell
+            else {
+                return
+        }
+        cell.jiggle()
+        
+        if let sampleVC = storyboard?.instantiateViewController(withIdentifier: "SampleVC") as? SampleViewController {
+            sampleVC.sourceFrame = cell.superview?.convert(cell.frame, to: nil)
+            sampleVC.transitioningDelegate = self
+            transition.sourceRect = cell.superview!.convert(cell.frame, to: nil)
+            present(sampleVC, animated: true, completion: nil)
+        }
+    }
+}
+
+extension MainViewController: UIViewControllerTransitioningDelegate {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.isPresenting = true
+        return transition
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.isPresenting = false
+        return transition
+    }
 }
 
 //MARK: - UICollectionViewDelegateFlowLayout
 extension MainViewController: UICollectionViewDelegateFlowLayout {
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 62, height: 62)
     }

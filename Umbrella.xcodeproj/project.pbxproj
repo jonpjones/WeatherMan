@@ -27,6 +27,13 @@
 		44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82DC1BCDF7C800A319D2 /* UIColor+Nerdery.swift */; };
 		44DE82DF1BCDF8EE00A319D2 /* WeatherRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82DE1BCDF8EE00A319D2 /* WeatherRequest.swift */; };
 		44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82E01BCDFBBB00A319D2 /* String+Umbrella.swift */; };
+		8F57B348447F1E85899F1D01 /* Pods_UmbrellaTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D26495CCF954522CFEBD860A /* Pods_UmbrellaTests.framework */; };
+		B4D554F8FE2022776F44FA5B /* Pods_Umbrella.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD215F44794BB04AC5801CFC /* Pods_Umbrella.framework */; };
+		F2363BF71F0D708A00D9A52A /* SettingsTransitioner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2363BF61F0D708A00D9A52A /* SettingsTransitioner.swift */; };
+		F24FD0D41F02FAFD0061F404 /* AnimationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24FD0D31F02FAFD0061F404 /* AnimationFactory.swift */; };
+		F24FD0D61F0409010061F404 /* UIViewPropertyAnimator+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24FD0D51F0409010061F404 /* UIViewPropertyAnimator+Extension.swift */; };
+		F24FD0D81F068F190061F404 /* SampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24FD0D71F068F190061F404 /* SampleViewController.swift */; };
+		F24FD0DA1F0696950061F404 /* TableViewTransitioner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24FD0D91F0696950061F404 /* TableViewTransitioner.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,11 +52,11 @@
 		1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HourlyWeatherCollectionViewCell.swift; sourceTree = "<group>"; };
 		13CCBE5C1DF116970041A854 /* UIViewController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
 		13CCBE5E1DF11AD90041A854 /* UIWindow+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIWindow+Extension.swift"; sourceTree = "<group>"; };
-		13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherAPIManager.swift; sourceTree = "<group>"; };
+		13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WeatherAPIManager.swift; path = Managers/WeatherAPIManager.swift; sourceTree = "<group>"; };
 		13FC691D1DEF27F3004F28D7 /* CurrentWeather.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentWeather.swift; sourceTree = "<group>"; };
 		13FC691F1DEF2B32004F28D7 /* HourlyWeather.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HourlyWeather.swift; sourceTree = "<group>"; };
 		13FC69211DEF3483004F28D7 /* CurrentSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentSettings.swift; sourceTree = "<group>"; };
-		13FC69231DEF3711004F28D7 /* WeatherInfoManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherInfoManager.swift; sourceTree = "<group>"; };
+		13FC69231DEF3711004F28D7 /* WeatherInfoManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WeatherInfoManager.swift; path = Managers/WeatherInfoManager.swift; sourceTree = "<group>"; };
 		44AEF0281BDA729E0056621F /* landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = landscape.png; sourceTree = "<group>"; };
 		44AEF0291BDA729E0056621F /* portrait-warm.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "portrait-warm.png"; sourceTree = "<group>"; };
 		44AEF02A1BDA729E0056621F /* portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portrait.png; sourceTree = "<group>"; };
@@ -69,6 +76,17 @@
 		44DE82DC1BCDF7C800A319D2 /* UIColor+Nerdery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Nerdery.swift"; sourceTree = "<group>"; };
 		44DE82DE1BCDF8EE00A319D2 /* WeatherRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherRequest.swift; sourceTree = "<group>"; };
 		44DE82E01BCDFBBB00A319D2 /* String+Umbrella.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Umbrella.swift"; sourceTree = "<group>"; };
+		80A64B283A7C645C2E8D3772 /* Pods-UmbrellaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UmbrellaTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-UmbrellaTests/Pods-UmbrellaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		8BD03380299F44C81F0C1B5F /* Pods-UmbrellaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UmbrellaTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-UmbrellaTests/Pods-UmbrellaTests.release.xcconfig"; sourceTree = "<group>"; };
+		AD215F44794BB04AC5801CFC /* Pods_Umbrella.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Umbrella.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6F71B68F73432DD383A90B4 /* Pods-Umbrella.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Umbrella.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Umbrella/Pods-Umbrella.debug.xcconfig"; sourceTree = "<group>"; };
+		D26495CCF954522CFEBD860A /* Pods_UmbrellaTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_UmbrellaTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6DD49798B9A1500883A0F17 /* Pods-Umbrella.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Umbrella.release.xcconfig"; path = "Pods/Target Support Files/Pods-Umbrella/Pods-Umbrella.release.xcconfig"; sourceTree = "<group>"; };
+		F2363BF61F0D708A00D9A52A /* SettingsTransitioner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTransitioner.swift; sourceTree = "<group>"; };
+		F24FD0D31F02FAFD0061F404 /* AnimationFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationFactory.swift; sourceTree = "<group>"; };
+		F24FD0D51F0409010061F404 /* UIViewPropertyAnimator+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewPropertyAnimator+Extension.swift"; sourceTree = "<group>"; };
+		F24FD0D71F068F190061F404 /* SampleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleViewController.swift; sourceTree = "<group>"; };
+		F24FD0D91F0696950061F404 /* TableViewTransitioner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewTransitioner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B4D554F8FE2022776F44FA5B /* Pods_Umbrella.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F57B348447F1E85899F1D01 /* Pods_UmbrellaTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */,
+				F24FD0D51F0409010061F404 /* UIViewPropertyAnimator+Extension.swift */,
 				1328FD791DF0BA610013EA27 /* DayHeaderView.swift */,
 			);
 			name = "Model Views";
@@ -125,6 +146,8 @@
 				44DE82B21BCDF45900A319D2 /* Umbrella */,
 				44DE82C71BCDF45900A319D2 /* UmbrellaTests */,
 				44DE82B11BCDF45900A319D2 /* Products */,
+				BED206015FB383FC92E09BA1 /* Pods */,
+				A94E2BB0B6898650309CDB34 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,6 +169,9 @@
 				44DE82D31BCDF48D00A319D2 /* View Controllers */,
 				44DE82B31BCDF45900A319D2 /* AppDelegate.swift */,
 				44DE82B71BCDF45900A319D2 /* Main.storyboard */,
+				F24FD0D31F02FAFD0061F404 /* AnimationFactory.swift */,
+				F24FD0D91F0696950061F404 /* TableViewTransitioner.swift */,
+				F2363BF61F0D708A00D9A52A /* SettingsTransitioner.swift */,
 				44DE82BA1BCDF45900A319D2 /* Assets.xcassets */,
 				44DE82BC1BCDF45900A319D2 /* LaunchScreen.storyboard */,
 				44DE82BF1BCDF45900A319D2 /* Info.plist */,
@@ -168,6 +194,7 @@
 			children = (
 				44DE82D81BCDF4C500A319D2 /* MainViewController.swift */,
 				44DE82D61BCDF4BA00A319D2 /* SettingsViewController.swift */,
+				F24FD0D71F068F190061F404 /* SampleViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -196,6 +223,26 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		A94E2BB0B6898650309CDB34 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AD215F44794BB04AC5801CFC /* Pods_Umbrella.framework */,
+				D26495CCF954522CFEBD860A /* Pods_UmbrellaTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BED206015FB383FC92E09BA1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C6F71B68F73432DD383A90B4 /* Pods-Umbrella.debug.xcconfig */,
+				D6DD49798B9A1500883A0F17 /* Pods-Umbrella.release.xcconfig */,
+				80A64B283A7C645C2E8D3772 /* Pods-UmbrellaTests.debug.xcconfig */,
+				8BD03380299F44C81F0C1B5F /* Pods-UmbrellaTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -203,9 +250,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 44DE82CD1BCDF45900A319D2 /* Build configuration list for PBXNativeTarget "Umbrella" */;
 			buildPhases = (
+				393D3B498F372A5B60E17C4A /* [CP] Check Pods Manifest.lock */,
 				44DE82AC1BCDF45900A319D2 /* Sources */,
 				44DE82AD1BCDF45900A319D2 /* Frameworks */,
 				44DE82AE1BCDF45900A319D2 /* Resources */,
+				46D2F7A87A43C29A411D32AE /* [CP] Embed Pods Frameworks */,
+				B012BACE18EE4AE149A5AFE4 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -220,9 +270,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 44DE82D01BCDF45900A319D2 /* Build configuration list for PBXNativeTarget "UmbrellaTests" */;
 			buildPhases = (
+				42B7DD83A115C9F326B29B73 /* [CP] Check Pods Manifest.lock */,
 				44DE82C01BCDF45900A319D2 /* Sources */,
 				44DE82C11BCDF45900A319D2 /* Frameworks */,
 				44DE82C21BCDF45900A319D2 /* Resources */,
+				9FEF8919755787A776BF83C5 /* [CP] Embed Pods Frameworks */,
+				0213143E43AA80CABD50693F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -245,6 +298,7 @@
 				TargetAttributes = {
 					44DE82AF1BCDF45900A319D2 = {
 						CreatedOnToolsVersion = 7.0.1;
+						DevelopmentTeam = CWGEY6NZ77;
 						LastSwiftMigration = 0810;
 					};
 					44DE82C31BCDF45900A319D2 = {
@@ -293,6 +347,99 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		0213143E43AA80CABD50693F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-UmbrellaTests/Pods-UmbrellaTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		393D3B498F372A5B60E17C4A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		42B7DD83A115C9F326B29B73 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		46D2F7A87A43C29A411D32AE /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Umbrella/Pods-Umbrella-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9FEF8919755787A776BF83C5 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-UmbrellaTests/Pods-UmbrellaTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B012BACE18EE4AE149A5AFE4 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Umbrella/Pods-Umbrella-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		44DE82AC1BCDF45900A319D2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -303,17 +450,22 @@
 				13FC69221DEF3483004F28D7 /* CurrentSettings.swift in Sources */,
 				44DE82DF1BCDF8EE00A319D2 /* WeatherRequest.swift in Sources */,
 				13CCBE5D1DF116970041A854 /* UIViewController+Extension.swift in Sources */,
+				F24FD0DA1F0696950061F404 /* TableViewTransitioner.swift in Sources */,
 				44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */,
 				13FC691E1DEF27F3004F28D7 /* CurrentWeather.swift in Sources */,
 				13FC69201DEF2B32004F28D7 /* HourlyWeather.swift in Sources */,
+				F24FD0D61F0409010061F404 /* UIViewPropertyAnimator+Extension.swift in Sources */,
 				1371172B1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift in Sources */,
 				1328FD7C1DF0EA840013EA27 /* UIVisualEffectView+Extension.swift in Sources */,
 				44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */,
 				44DE82D91BCDF4C500A319D2 /* MainViewController.swift in Sources */,
 				44DE82B41BCDF45900A319D2 /* AppDelegate.swift in Sources */,
 				1328FD7A1DF0BA610013EA27 /* DayHeaderView.swift in Sources */,
+				F24FD0D41F02FAFD0061F404 /* AnimationFactory.swift in Sources */,
+				F24FD0D81F068F190061F404 /* SampleViewController.swift in Sources */,
 				13FC691B1DECFA3C004F28D7 /* WeatherAPIManager.swift in Sources */,
 				44DE82D71BCDF4BA00A319D2 /* SettingsViewController.swift in Sources */,
+				F2363BF71F0D708A00D9A52A /* SettingsTransitioner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,11 +595,13 @@
 		};
 		44DE82CE1BCDF45900A319D2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C6F71B68F73432DD383A90B4 /* Pods-Umbrella.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = CWGEY6NZ77;
 				INFOPLIST_FILE = Umbrella/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nerdery.Umbrella;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nerdery.Umbrella2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -455,11 +609,13 @@
 		};
 		44DE82CF1BCDF45900A319D2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D6DD49798B9A1500883A0F17 /* Pods-Umbrella.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = CWGEY6NZ77;
 				INFOPLIST_FILE = Umbrella/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.nerdery.Umbrella;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nerdery.Umbrella2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -467,6 +623,7 @@
 		};
 		44DE82D11BCDF45900A319D2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 80A64B283A7C645C2E8D3772 /* Pods-UmbrellaTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = UmbrellaTests/Info.plist;
@@ -480,6 +637,7 @@
 		};
 		44DE82D21BCDF45900A319D2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8BD03380299F44C81F0C1B5F /* Pods-UmbrellaTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = UmbrellaTests/Info.plist;

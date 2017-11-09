@@ -17,5 +17,4 @@ class DayHeaderView: UICollectionReusableView {
         super.layoutSubviews()
         backgroundView.backgroundColor = UIColor(0x888888)
     }
-    
 }
