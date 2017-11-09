@@ -26,88 +26,16 @@ class HourlyWeatherCollectionViewCell: UICollectionViewCell {
         tempLabel.textColor = tintColor
     }
     
-    func jiggle() {
-        if animator == nil {
-            animator = UIViewPropertyAnimator(duration: 0.8, dampingRatio: 0.1)
-            animator?.isInterruptible = true
-            animator?.add(.bounceScale(view: self.contentView))
-            animator?.add(.spin(view: self.iconImageView))
-            animator?.addCompletion({ (position) in
-                self.animator = nil
-            })
-           
+    func format(with hour: HourlyWeather) {
+        self.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+        self.timeLabel.text = hour.timeString
+        self.tempLabel.text = currentSettings.fahrenheight ? hour.tempF + "˚" : hour.tempC + "˚"
+        self.tint = hour.tintColor
+        if let iconDict = weatherInfo.weatherIconDictionary[(hour.iconName)] {
+            let state = hour.tintColor != nil ? "solid" : "outline"
+            if let image = iconDict[state]?.withRenderingMode(.alwaysTemplate) {
+                self.iconImageView.image = image
+            }
         }
-        else if animator?.isRunning == true {
-            animator?.pauseAnimation()
-            animator?.isReversed = true
-            
-        }
-        animator?.startAnimation()
-        
-    }
-    
-    func pop() {
-        if let expanded = expanded {
-            self.expanded = !expanded
-        } else {
-            expanded = true
-        }
-        
-        if expanded ?? true {
-            let animationGroup = CAAnimationGroup()
-            
-            let pulse = CASpringAnimation(keyPath: "transform.scale")
-            pulse.fromValue = 1.0
-            pulse.toValue = 1.1
-            pulse.damping = 50
-            pulse.stiffness = 70
-            pulse.autoreverses = true
-            pulse.initialVelocity = -10
-            
-            let opacityAnim = CABasicAnimation(keyPath: "opacity")
-            opacityAnim.fromValue = 1.0
-            opacityAnim.toValue = 0.8
-            
-            animationGroup.autoreverses = true
-            animationGroup.repeatCount = 0
-            animationGroup.duration = 0.8
-            
-            animationGroup.isRemovedOnCompletion = true
-            animationGroup.animations = [opacityAnim, pulse]
-            
-            self.layer.add(animationGroup, forKey: "pop")
-            
-        } else {
-            
-            let unpopAnimGroup = CAAnimationGroup()
-            let cornerAnim = CABasicAnimation(keyPath: "cornerRadius")
-            cornerAnim.fromValue = layer.presentation()?.cornerRadius
-            cornerAnim.toValue = 0.0
-            
-            let scale = CABasicAnimation(keyPath: "transform.scale")
-            scale.fromValue = layer.presentation()?.contentsScale
-            scale.toValue = 1.0
-            
-            let bgColorAnim = CABasicAnimation(keyPath: "backgroundColor")
-            bgColorAnim.toValue = UIColor.white.cgColor
-            
-            unpopAnimGroup.duration = 2
-            unpopAnimGroup.animations = [cornerAnim, scale, bgColorAnim]
-            
-            self.layer.add(unpopAnimGroup, forKey: "pop")
-            
-            UIView.animate(withDuration: unpopAnimGroup.duration, animations: {
-                let tintColor = self.tint != nil ? UIColor(self.tint!) : .black
-                self.timeLabel.textColor = tintColor
-                self.iconImageView.tintColor = tintColor
-                self.tempLabel.textColor = tintColor
-            })
-            
-        }
-    }
-    
-    func unPop() {
-        
-        
     }
 }

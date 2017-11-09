@@ -29,11 +29,9 @@
 		44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DE82E01BCDFBBB00A319D2 /* String+Umbrella.swift */; };
 		8F57B348447F1E85899F1D01 /* Pods_UmbrellaTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D26495CCF954522CFEBD860A /* Pods_UmbrellaTests.framework */; };
 		B4D554F8FE2022776F44FA5B /* Pods_Umbrella.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD215F44794BB04AC5801CFC /* Pods_Umbrella.framework */; };
-		F2363BF71F0D708A00D9A52A /* SettingsTransitioner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2363BF61F0D708A00D9A52A /* SettingsTransitioner.swift */; };
+		F24A6E211FB4E028005B934F /* RxNetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24A6E201FB4E028005B934F /* RxNetworkLayer.swift */; };
 		F24FD0D41F02FAFD0061F404 /* AnimationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24FD0D31F02FAFD0061F404 /* AnimationFactory.swift */; };
-		F24FD0D61F0409010061F404 /* UIViewPropertyAnimator+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24FD0D51F0409010061F404 /* UIViewPropertyAnimator+Extension.swift */; };
 		F24FD0D81F068F190061F404 /* SampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24FD0D71F068F190061F404 /* SampleViewController.swift */; };
-		F24FD0DA1F0696950061F404 /* TableViewTransitioner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24FD0D91F0696950061F404 /* TableViewTransitioner.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,11 +80,9 @@
 		C6F71B68F73432DD383A90B4 /* Pods-Umbrella.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Umbrella.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Umbrella/Pods-Umbrella.debug.xcconfig"; sourceTree = "<group>"; };
 		D26495CCF954522CFEBD860A /* Pods_UmbrellaTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_UmbrellaTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6DD49798B9A1500883A0F17 /* Pods-Umbrella.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Umbrella.release.xcconfig"; path = "Pods/Target Support Files/Pods-Umbrella/Pods-Umbrella.release.xcconfig"; sourceTree = "<group>"; };
-		F2363BF61F0D708A00D9A52A /* SettingsTransitioner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTransitioner.swift; sourceTree = "<group>"; };
+		F24A6E201FB4E028005B934F /* RxNetworkLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxNetworkLayer.swift; sourceTree = "<group>"; };
 		F24FD0D31F02FAFD0061F404 /* AnimationFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationFactory.swift; sourceTree = "<group>"; };
-		F24FD0D51F0409010061F404 /* UIViewPropertyAnimator+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewPropertyAnimator+Extension.swift"; sourceTree = "<group>"; };
 		F24FD0D71F068F190061F404 /* SampleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleViewController.swift; sourceTree = "<group>"; };
-		F24FD0D91F0696950061F404 /* TableViewTransitioner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewTransitioner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,7 +109,6 @@
 			isa = PBXGroup;
 			children = (
 				1371172A1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift */,
-				F24FD0D51F0409010061F404 /* UIViewPropertyAnimator+Extension.swift */,
 				1328FD791DF0BA610013EA27 /* DayHeaderView.swift */,
 			);
 			name = "Model Views";
@@ -122,6 +117,7 @@
 		13FC691C1DECFC30004F28D7 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F24A6E201FB4E028005B934F /* RxNetworkLayer.swift */,
 				13FC691A1DECFA3C004F28D7 /* WeatherAPIManager.swift */,
 				13FC69231DEF3711004F28D7 /* WeatherInfoManager.swift */,
 			);
@@ -170,8 +166,6 @@
 				44DE82B31BCDF45900A319D2 /* AppDelegate.swift */,
 				44DE82B71BCDF45900A319D2 /* Main.storyboard */,
 				F24FD0D31F02FAFD0061F404 /* AnimationFactory.swift */,
-				F24FD0D91F0696950061F404 /* TableViewTransitioner.swift */,
-				F2363BF61F0D708A00D9A52A /* SettingsTransitioner.swift */,
 				44DE82BA1BCDF45900A319D2 /* Assets.xcassets */,
 				44DE82BC1BCDF45900A319D2 /* LaunchScreen.storyboard */,
 				44DE82BF1BCDF45900A319D2 /* Info.plist */,
@@ -448,13 +442,12 @@
 				13FC69241DEF3711004F28D7 /* WeatherInfoManager.swift in Sources */,
 				13CCBE5F1DF11AD90041A854 /* UIWindow+Extension.swift in Sources */,
 				13FC69221DEF3483004F28D7 /* CurrentSettings.swift in Sources */,
+				F24A6E211FB4E028005B934F /* RxNetworkLayer.swift in Sources */,
 				44DE82DF1BCDF8EE00A319D2 /* WeatherRequest.swift in Sources */,
 				13CCBE5D1DF116970041A854 /* UIViewController+Extension.swift in Sources */,
-				F24FD0DA1F0696950061F404 /* TableViewTransitioner.swift in Sources */,
 				44DE82E11BCDFBBB00A319D2 /* String+Umbrella.swift in Sources */,
 				13FC691E1DEF27F3004F28D7 /* CurrentWeather.swift in Sources */,
 				13FC69201DEF2B32004F28D7 /* HourlyWeather.swift in Sources */,
-				F24FD0D61F0409010061F404 /* UIViewPropertyAnimator+Extension.swift in Sources */,
 				1371172B1DF084DA008BEE6F /* HourlyWeatherCollectionViewCell.swift in Sources */,
 				1328FD7C1DF0EA840013EA27 /* UIVisualEffectView+Extension.swift in Sources */,
 				44DE82DD1BCDF7C800A319D2 /* UIColor+Nerdery.swift in Sources */,
@@ -465,7 +458,6 @@
 				F24FD0D81F068F190061F404 /* SampleViewController.swift in Sources */,
 				13FC691B1DECFA3C004F28D7 /* WeatherAPIManager.swift in Sources */,
 				44DE82D71BCDF4BA00A319D2 /* SettingsViewController.swift in Sources */,
-				F2363BF71F0D708A00D9A52A /* SettingsTransitioner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

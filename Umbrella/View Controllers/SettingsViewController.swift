@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 protocol SettingsViewControllerDelegate {
     func preferredTemperatureStyleChanged()
@@ -20,9 +22,27 @@ class SettingsViewController: UIViewController {
     @IBOutlet weak var zipTextField: UITextField!
     
     var delegate: SettingsViewControllerDelegate?
-    
+    let disposeBag = DisposeBag()
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        zipTextField.rx
+            .controlEvent(.editingDidEndOnExit)
+            .asObservable()
+            .map { self.zipTextField.text }
+            .filter { (text) -> Bool in
+                let zipCodeRegex =  "^[0-9]{5}(-[0-9]{4})?$"
+                let zipCodePredicate = NSPredicate(format: "SELF MATCHES %@", zipCodeRegex)
+                return zipCodePredicate.evaluate(with: text)
+            }
+            .subscribe(onNext: { text in
+                if let zipText = text {
+                    print("new zip code")
+                    RxNetworkLayer.shared.currentZipcode.onNext(zipText)
+                }
+            })
+            .disposed(by: disposeBag)
+        
         temperatureSegmentedControl.selectedSegmentIndex = currentSettings.fahrenheight ? 0 : 1
         addVibrancy(view: temperatureSegmentedControl)
         addVibrancy(view: getWeatherButton)
@@ -38,7 +58,7 @@ class SettingsViewController: UIViewController {
         bgView.addGestureRecognizer(tapGesture)
     }
     
-    func dissmissTap(_: UITapGestureRecognizer) {
+    @objc func dissmissTap(_: UITapGestureRecognizer) {
         presentingViewController?.dismiss(animated: true, completion: nil)
     }
     
@@ -60,23 +80,22 @@ class SettingsViewController: UIViewController {
         sender.tintColorDidChange()
     }
     
-    @IBAction func getTheWeatherButtonTapped(_ sender: UIButton) {
-        if zipTextField.hasText {
-            currentSettings.zip = zipTextField.text!
-            var request = WeatherRequest(APIKey: apiKey)
-            request.zipCode = currentSettings.zip
-            WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: request.URL!, completion: { (success) in
-                guard success else {
-                    DispatchQueue.main.async {
-                        self.presentErrorAlert()
-                    }
-                    return
-                }
-                DispatchQueue.main.async {
-                    self.presentingViewController?.dismiss(animated: true, completion: nil)
-                }
-            })
-        }  
-    }
+//    @IBAction func getTheWeatherButtonTapped(_ sender: UIButton) {
+//        if zipTextField.hasText {
+//            currentSettings.zip = zipTextField.text!
+//            var request = WeatherRequest(APIKey: apiKey, zipCode: currentSettings.zip)
+//            WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: request!.URL, completion: { (success) in
+//                guard success else {
+//                    DispatchQueue.main.async {
+//                        self.presentErrorAlert()
+//                    }
+//                    return
+//                }
+//                DispatchQueue.main.async {
+//                    self.presentingViewController?.dismiss(animated: true, completion: nil)
+//                }
+//            })
+//        }
+//    }
 }
 

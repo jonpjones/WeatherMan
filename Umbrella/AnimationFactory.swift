@@ -22,10 +22,6 @@ enum BasicAnimation {
     case bounceScale(view: UIView)
     case blueView(_: UIVisualEffectView, shouldBlur: Bool)
     
-    
-    
-    
-    
     func animation() -> (() -> Void) {
         switch self {
         case .blueView(let blurView, let shouldBlur):
@@ -53,6 +49,7 @@ enum BasicAnimation {
             return {
                 
             }
+            
         case .bounceScale(let view):
             return {
                 UIView.animateKeyframes(withDuration: 1, delay: 0, options: [], animations: {

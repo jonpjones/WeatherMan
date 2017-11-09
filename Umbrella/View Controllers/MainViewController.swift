@@ -7,9 +7,12 @@
 //
 
 import UIKit
-let apiKey = "833018b6135efd73"
+import RxSwift
+import RxCocoa
+import RxDataSources
+
+
 class MainViewController: UIViewController {
-    
     @IBOutlet weak var currentLocationLabel: UILabel!
     @IBOutlet weak var currentTempLabel: UILabel!
     @IBOutlet weak var currentConditionsLabel: UILabel!
@@ -19,26 +22,47 @@ class MainViewController: UIViewController {
     @IBOutlet var currentWeatherBottomConstraint: NSLayoutConstraint!
     @IBOutlet var currentTempHeight: NSLayoutConstraint!
     
+    let disposeBag = DisposeBag()
+    var zipcode = Variable<String>("")
+    var totalWeather = Variable<[[HourlyWeather]]>([])
+    var responseURL: Variable<URL>?
+    
     var blurView: UIVisualEffectView?
     var daysHourlyWeatherArray: [[HourlyWeather]]?
-    let transition = TableViewTransitioner()
-    
+ 
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        weatherInfo.delegate = self
-//        var weatherRequest = WeatherRequest(APIKey: apiKey)
-//        weatherRequest.zipCode = currentSettings.zip
-//        let url = weatherRequest.URL
-//        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: url!) { (success) in
-//            guard success else {
-//                self.presentErrorAlert()
-//                return
-//            }
-//        }
-    }
     
+        weatherInfo.delegate = self
+    //    collectionView.dataSource = self
+        let network = RxNetworkLayer.shared
+
+        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfHourlyData>(configureCell: { (sectionData, collectionView, indexPath, weather) -> UICollectionViewCell in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HourlyCellID", for: indexPath) as? HourlyWeatherCollectionViewCell else {
+                fatalError("Unable to dequeue correct cell type for given index path.")
+            }
+            cell.format(with: weather)
+            return cell
+        }, configureSupplementaryView:  { (sectionData, collectionView, kind, indexPath) -> UICollectionReusableView in
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "HeaderID", for: indexPath) as? DayHeaderView else {
+                fatalError("Unable to dequeue correct header type for given index path.")
+            }
+            header.headerLabel.text = sectionData.sectionModels[indexPath.section].header
+            return header
+        })
+        let observable = Observable.zip([network.todaysWeather, network.tomorrowsWeather, network.otherWeather]) { return $0 }
+        
+        observable
+            .bind(to: collectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        collectionView.rx
+            .setDelegate(self)
+            .disposed(by: disposeBag)
+        
+    }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         if UIDevice.current.orientation.isLandscape {
@@ -69,6 +93,22 @@ class MainViewController: UIViewController {
         settingsViewController.popoverPresentationController?.canOverlapSourceViewRect = true
         settingsViewController.preferredContentSize = view.frame.size
         self.present(settingsViewController, animated: true, completion: nil)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y < 0  {
+            let scrolledPastThreshold = 60 - scrollView.contentOffset.y
+            if !(UIDevice.current.orientation == UIDeviceOrientation.landscapeLeft ||
+                UIDevice.current.orientation == UIDeviceOrientation.landscapeRight) {
+                currentLocationLabelBottomConstraint.constant = (scrolledPastThreshold) > 90 ? 5 - ((30 + scrollView.contentOffset.y) / 2) : 5
+            }
+            currentTempHeight.constant = min(scrolledPastThreshold, 90)
+            currentWeatherBottomConstraint.constant = scrollView.contentOffset.y
+            currentTempLabel.font = UIFont(name: currentTempLabel.font.fontName, size: min(scrolledPastThreshold, 90))
+            UIView.animate(withDuration: 0, animations: {
+                self.view.layoutIfNeeded()
+            })
+        }
     }
 }
 
@@ -115,109 +155,80 @@ extension MainViewController: WeatherInfoDelegate {
                 }
             }
         }
-        collectionView.reloadData()
+       // collectionView.reloadData()
       //  collectionView.reloadItems(at: indexPathsToUpdate)
     }
 }
 
 // MARK: - UICollectionViewDataSource
-extension MainViewController: UICollectionViewDataSource {
-    
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return daysHourlyWeatherArray?.count ?? 0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let day = daysHourlyWeatherArray?[section]
-        return day?.count ?? 0
-    }
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        UIView.animate(withDuration: 0.3) {
-            cell.transform = .identity
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HourlyCellID", for: indexPath) as! HourlyWeatherCollectionViewCell
-        let day = daysHourlyWeatherArray?[indexPath.section]
-        let hour = day?[indexPath.item]
-        cell.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
-        cell.timeLabel.text = hour?.timeString
-        cell.tempLabel.text = currentSettings.fahrenheight ? hour!.tempF + "˚" : hour!.tempC + "˚"
-        cell.tint = hour?.tintColor
-        
-        if let iconDict = weatherInfo.weatherIconDictionary[(hour?.iconName)!] {
-            let state = hour?.tintColor != nil ? "solid" : "outline"
-            if let image = iconDict[state]?.withRenderingMode(.alwaysTemplate) {
-                cell.iconImageView.image = image
-            }
-        }
-        
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == UICollectionElementKindSectionHeader {
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "HeaderID", for: indexPath) as! DayHeaderView
-            var dayString = ""
-            switch indexPath.section {
-            case 0: dayString = "Today"
-            case 1: dayString = "Tomorrow"
-            case 2: dayString = "Two Days From Now"
-            default: break
-            }
-            header.headerLabel.text = dayString
-            return header
-        }
-        return UICollectionReusableView()
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView.contentOffset.y < 0  {
-            let scrolledPastThreshold = 60 - scrollView.contentOffset.y
-            if !(UIDevice.current.orientation == UIDeviceOrientation.landscapeLeft ||
-                UIDevice.current.orientation == UIDeviceOrientation.landscapeRight) {
-                currentLocationLabelBottomConstraint.constant = (scrolledPastThreshold) > 90 ? 5 - ((30 + scrollView.contentOffset.y) / 2) : 5
-            }
-            currentTempHeight.constant = min(scrolledPastThreshold, 90)
-            currentWeatherBottomConstraint.constant = scrollView.contentOffset.y
-            currentTempLabel.font = UIFont(name: currentTempLabel.font.fontName, size: min(scrolledPastThreshold, 90))
-            UIView.animate(withDuration: 0, animations: {
-                self.view.layoutIfNeeded()
-            })
-        }
-    }
-}
-
-extension MainViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? HourlyWeatherCollectionViewCell
-            else {
-                return
-        }
-        cell.jiggle()
-        
-        if let sampleVC = storyboard?.instantiateViewController(withIdentifier: "SampleVC") as? SampleViewController {
-            sampleVC.sourceFrame = cell.superview?.convert(cell.frame, to: nil)
-            sampleVC.transitioningDelegate = self
-            transition.sourceRect = cell.superview!.convert(cell.frame, to: nil)
-            present(sampleVC, animated: true, completion: nil)
-        }
-    }
-}
-
-extension MainViewController: UIViewControllerTransitioningDelegate {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.isPresenting = true
-        return transition
-    }
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.isPresenting = false
-        return transition
-    }
-}
+//extension MainViewController: UICollectionViewDataSource {
+//    func numberOfSections(in collectionView: UICollectionView) -> Int {
+//        print("Number of sections")
+//
+//        return totalWeather.value.count
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        print("Loading number of items in section")
+//        let day = totalWeather.value[section]
+//        return day.count
+//    }
+//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        UIView.animate(withDuration: 0.3) {
+//            cell.transform = .identity
+//        }
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HourlyCellID", for: indexPath) as! HourlyWeatherCollectionViewCell
+//        let day = totalWeather.value[indexPath.section]
+//        let hour = day[indexPath.item]
+//        cell.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+//        cell.timeLabel.text = hour.timeString
+//        cell.tempLabel.text = currentSettings.fahrenheight ? hour.tempF + "˚" : hour.tempC + "˚"
+//        cell.tint = hour.tintColor
+//        if let iconDict = weatherInfo.weatherIconDictionary[(hour.iconName)] {
+//            let state = hour.tintColor != nil ? "solid" : "outline"
+//            if let image = iconDict[state]?.withRenderingMode(.alwaysTemplate) {
+//                cell.iconImageView.image = image
+//            }
+//        }
+//
+//        return cell
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+//        if kind == UICollectionElementKindSectionHeader {
+//            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "HeaderID", for: indexPath) as! DayHeaderView
+//            var dayString = ""
+//            switch indexPath.section {
+//            case 0: dayString = "Today"
+//            case 1: dayString = "Tomorrow"
+//            case 2: dayString = "Two Days From Now"
+//            default: break
+//            }
+//            header.headerLabel.text = dayString
+//            return header
+//        }
+//        return UICollectionReusableView()
+//    }
+//
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        if scrollView.contentOffset.y < 0  {
+//            let scrolledPastThreshold = 60 - scrollView.contentOffset.y
+//            if !(UIDevice.current.orientation == UIDeviceOrientation.landscapeLeft ||
+//                UIDevice.current.orientation == UIDeviceOrientation.landscapeRight) {
+//                currentLocationLabelBottomConstraint.constant = (scrolledPastThreshold) > 90 ? 5 - ((30 + scrollView.contentOffset.y) / 2) : 5
+//            }
+//            currentTempHeight.constant = min(scrolledPastThreshold, 90)
+//            currentWeatherBottomConstraint.constant = scrollView.contentOffset.y
+//            currentTempLabel.font = UIFont(name: currentTempLabel.font.fontName, size: min(scrolledPastThreshold, 90))
+//            UIView.animate(withDuration: 0, animations: {
+//                self.view.layoutIfNeeded()
+//            })
+//        }
+//    }
+//}
 
 //MARK: - UICollectionViewDelegateFlowLayout
 extension MainViewController: UICollectionViewDelegateFlowLayout {

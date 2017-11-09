@@ -16,32 +16,29 @@ struct WeatherRequest {
     private let APIKey: String
     
     /// The zip code to send to the server.
-    var zipCode: String?
+    var zipCode: String
     
-    var URL: Foundation.URL? {
-        get {
-            /// If there is no zip code, there is no url
-            guard let zip = zipCode else {
-                return nil
-            }
-            
-            var urlComponents = URLComponents()
-            urlComponents.scheme = "https"
-            urlComponents.host = "api.wunderground.com"
-            urlComponents.path = "/api/\(APIKey)/conditions/hourly/q/\(zip).json"
-            
-            return urlComponents.url
-        }
-    }
+    let URL: URL
     
     /**
-    Initializer
-    
-    - parameter apiKey: The API Key for weather underground
-    
-    - returns: The initialized object
-    */
-    init(APIKey: String) {
+     Initializer
+     
+     - parameter apiKey: The API Key for weather underground
+     
+     - returns: The initialized object
+     */
+    init?(APIKey: String, zipCode: String) {
         self.APIKey = APIKey
+        self.zipCode = zipCode
+        
+        var urlComponents = URLComponents()
+        urlComponents.scheme = "https"
+        urlComponents.host = "api.wunderground.com"
+        urlComponents.path = "/api/\(APIKey)/conditions/hourly/q/\(zipCode).json"
+        
+        guard let url = urlComponents.url else {
+            return nil
+        }
+        self.URL = url
     }
 }

@@ -18,9 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        var request = WeatherRequest(APIKey: apiKey)
-        request.zipCode = CurrentSettings.sharedInstance.zip
-        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: request.URL!) { (success) in
+        let request = WeatherRequest(APIKey: apiKey, zipCode: CurrentSettings.sharedInstance.zip)
+        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: request!.URL) { (success) in
             guard success else {
                 let window = UIApplication.shared.keyWindow
                 let presentedVC = window?.visibleViewController()
