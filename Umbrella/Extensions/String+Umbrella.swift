@@ -27,8 +27,9 @@ extension String {
         } else {
             urlComponents.path = "/\(self).png"
         }
-        
-        return urlComponents.url
+        let url = urlComponents.url
+
+        return url
     }
     
 }

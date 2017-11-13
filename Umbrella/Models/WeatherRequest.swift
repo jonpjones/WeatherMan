@@ -36,6 +36,7 @@ struct WeatherRequest {
         urlComponents.host = "api.wunderground.com"
         urlComponents.path = "/api/\(APIKey)/conditions/hourly/q/\(zipCode).json"
         
+        
         guard let url = urlComponents.url else {
             return nil
         }

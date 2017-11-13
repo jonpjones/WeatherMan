@@ -73,13 +73,13 @@ class WeatherInfoManager {
             let maxHour = hourlySorted.first(where: { (hour) -> Bool in
                 return hour.tempF == maxTemp
             })
-            maxHour?.tintColor = 0xFF9800
+           // maxHour?.tintColor = 0xFF9800
             solidIconNameSet.insert(maxHour!.iconName)
             
             let minHour = hourlySorted.first(where: { (hour) -> Bool in
                 return hour.tempF == minTemp
             })
-            minHour?.tintColor = 0x03A9F4
+          //  minHour?.tintColor = 0x03A9F4
             solidIconNameSet.insert(minHour!.iconName)
             
             hourlySorted.forEach({ (hour) in
@@ -111,3 +111,4 @@ extension WeatherInfoManager: WeatherAPIManagerDelegate {
         delegate?.receivedIcon(name: name, solid: solid)
     }
 }
+

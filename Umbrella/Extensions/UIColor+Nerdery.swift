@@ -9,7 +9,6 @@
 import UIKit
 
 extension UIColor {
-    
     /**
     Simple method to go from human readable form to a UIColor.
 
@@ -25,4 +24,8 @@ extension UIColor {
         self.init(red: CGFloat(rawRed), green: CGFloat(rawGreen), blue: CGFloat(rawBlue), alpha: alpha)
     }
     
+    static var minimumBlue: UIColor { return UIColor(0x03A9F4) }
+    static var maximumOrange: UIColor { return UIColor(0xFF9800) }
 }
+
+

@@ -7,10 +7,16 @@
 //
 
 import Foundation
+import RxSwift
 
-let currentSettings = CurrentSettings.sharedInstance
+enum TempMode: Int {
+    case fahrenheight = 0
+    case celcius = 1
+}
+
 class CurrentSettings {
     static let sharedInstance = CurrentSettings()
+    private init() {}
     var zip: String = "60647"
-    var fahrenheight: Bool = true
+    var tempStyle: BehaviorSubject<TempMode> = BehaviorSubject<TempMode>(value: .fahrenheight)
 }

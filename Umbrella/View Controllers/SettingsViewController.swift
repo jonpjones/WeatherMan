@@ -43,7 +43,15 @@ class SettingsViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        temperatureSegmentedControl.selectedSegmentIndex = currentSettings.fahrenheight ? 0 : 1
+        CurrentSettings.sharedInstance
+            .tempStyle
+            .asObservable()
+            .take(1)
+            .subscribe(onNext: { tempStyle in
+                self.temperatureSegmentedControl.selectedSegmentIndex = tempStyle.rawValue
+            })
+            .disposed(by: disposeBag)
+        
         addVibrancy(view: temperatureSegmentedControl)
         addVibrancy(view: getWeatherButton)
     }
@@ -73,7 +81,10 @@ class SettingsViewController: UIViewController {
     }
 
     @IBAction func segmentedControlValueChanged(_ sender: UISegmentedControl) {
-        currentSettings.fahrenheight = sender.selectedSegmentIndex == 0
+        
+        let tempStyle: TempMode = (sender.selectedSegmentIndex == 0) ? .fahrenheight : .celcius
+        CurrentSettings.sharedInstance.tempStyle.onNext(tempStyle)
+        
         delegate?.preferredTemperatureStyleChanged()
         backgroundBlurView.tintColorDidChange()
         sender.layoutIfNeeded()

@@ -12,11 +12,11 @@ import RxDataSources
 
 struct SectionOfHourlyData {
     var header: String
-    var items: [HourlyWeather]
+    var items: [HourlyCellViewModel]
 }
 
 extension SectionOfHourlyData: SectionModelType {
-    typealias Item = HourlyWeather
+    typealias Item = HourlyCellViewModel
     
     init(original: SectionOfHourlyData, items: [Item]) {
         self = original
@@ -32,7 +32,11 @@ open class HourlyWeather {
     let tempF: String
     let timeString: String
     let timeSince1970: Double
-    var tintColor: UInt?
+    var tintColor: UIColor = .black
+    var url: URL? {
+            return iconName.nrd_weatherIconURL(highlighted: (tintColor == UIColor.minimumBlue ||  tintColor == UIColor.maximumOrange))
+    }
+    var image: UIImage?
     let isToday: Bool
     let isTomorrow: Bool
     

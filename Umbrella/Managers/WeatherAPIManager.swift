@@ -72,8 +72,10 @@ class WeatherAPIManager {
     }
     
     func fetchIcon(name: String, solid: Bool) {
-        let iconURL = name.nrd_weatherIconURL(highlighted: solid)
-        URLSession.shared.dataTask(with: iconURL!) { (data, response, error) in
+        guard let iconURL = name.nrd_weatherIconURL(highlighted: solid) else {
+            return
+        }
+        URLSession.shared.dataTask(with: iconURL) { (data, response, error) in
             guard error == nil else { return }
             if let image = UIImage(data: data!) {
                 DispatchQueue.main.async {
