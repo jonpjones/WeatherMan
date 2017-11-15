@@ -13,13 +13,6 @@ struct CurrentWeather {
     let tempF: Int
     let conditions: String
     
-    init(withLocation fullLocation: String, tempC: Int, tempF: Int, conditions: String) {
-        self.fullLocation = fullLocation
-        self.tempC = tempC
-        self.tempF = tempF
-        self.conditions = conditions
-    }
-    
     init?(with json: [String: Any]) {
         guard let currentObservation = json["current_observation"] as? [String: Any] else {
             print("Unable to get current weather information")

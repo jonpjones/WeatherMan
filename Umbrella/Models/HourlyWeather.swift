@@ -24,8 +24,6 @@ extension SectionOfHourlyData: SectionModelType {
     }
 }
 
-
-
 open class HourlyWeather {
     let iconName: String
     let tempC: String
@@ -39,17 +37,7 @@ open class HourlyWeather {
     var image: UIImage?
     let isToday: Bool
     let isTomorrow: Bool
-    
-    init(iconName: String, tempC: String, tempF: String, timeString: String, timeSince1970: Double, isToday: Bool, isTomorrow: Bool) {
-        self.iconName = iconName
-        self.tempC = tempC
-        self.tempF = tempF
-        self.timeString = timeString
-        self.timeSince1970 = timeSince1970
-        self.isToday = isToday
-        self.isTomorrow = isTomorrow
-    }
-    
+
     init?(with hour: [String: Any]) {
         let calendar = Calendar(identifier: .gregorian)
         let time = hour["FCTTIME"] as? [String: Any]
@@ -64,7 +52,6 @@ open class HourlyWeather {
             else {
                 print("Unable to parse dictionary into Hourly Weather")
                 return nil
-                
         }
         
         let date = Date(timeIntervalSince1970: doubleTime)
