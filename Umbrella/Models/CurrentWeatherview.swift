@@ -16,9 +16,9 @@ class CurrentWeatherview: UIView {
     @IBOutlet var currentLocationLabel: UILabel!
     @IBOutlet var currentConditionsLabel: UILabel!
     @IBOutlet var settingsButton: UIButton!
-    
+    private var nibView: UIView?
     private let disposeBag = DisposeBag()
-    var settingsTapped: ControlEvent<()>?
+    var settingsTapped = PublishSubject<(UIButton)>()
     
     var currentWeatherViewModel: CurrentWeatherViewModel? {
         didSet {
@@ -34,7 +34,7 @@ class CurrentWeatherview: UIView {
                     .disposed(by: disposeBag)
                 viewModel.backgroundColor
                     .subscribe(onNext: { [weak self] newColor in
-                        self?.backgroundColor = newColor
+                        self?.nibView?.backgroundColor = newColor
                     })
                     .disposed(by: disposeBag)
             }
@@ -49,6 +49,7 @@ class CurrentWeatherview: UIView {
     
     func commonInit() {
         if let nib = Bundle.main.loadNibNamed("CurrentWeatherView", owner: self, options: nil), let subView = nib[0] as? UIView {
+            self.nibView = subView
             self.addSubview(subView)
             self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             subView.translatesAutoresizingMaskIntoConstraints = false
@@ -56,10 +57,11 @@ class CurrentWeatherview: UIView {
             subView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
             subView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
             subView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
-            
         }
         
-        let events = settingsButton.rx.controlEvent(UIControlEvents.touchUpInside)
-        self.settingsTapped = events
+        settingsButton.rx.controlEvent(.touchUpInside).map({ _ -> UIButton in
+            print("Binding event")
+            return self.settingsButton
+        }).bind(to: self.settingsTapped)
     }
 }

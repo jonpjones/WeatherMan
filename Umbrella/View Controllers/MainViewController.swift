@@ -16,7 +16,7 @@ class MainViewController: UIViewController {
     @IBOutlet weak var currentLocationLabel: UILabel!
     @IBOutlet weak var currentTempLabel: UILabel!
     @IBOutlet weak var currentConditionsLabel: UILabel!
-    @IBOutlet weak var currentWeatherBGView: UIView!
+    @IBOutlet weak var currentWeatherBGView: CurrentWeatherview!
     
     @IBOutlet var currentLocationLabelBottomConstraint: NSLayoutConstraint!
     @IBOutlet var currentWeatherBottomConstraint: NSLayoutConstraint!
@@ -37,7 +37,6 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
-        weatherInfo.delegate = self
         let network = RxNetworkLayer.shared
 
         let today = network.todaysWeather.map { (hourly) -> SectionOfHourlyData in
@@ -70,6 +69,9 @@ class MainViewController: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
+        
+        subscribeToCurrentWeather()
+        subscribeToSettingsGear()
     }
     
     func formatRxDataSource(with observable: Observable<[SectionOfHourlyData]>) {
@@ -107,6 +109,24 @@ class MainViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    func subscribeToCurrentWeather() {
+        RxNetworkLayer.shared.currentWeather
+            .map { return CurrentWeatherViewModel(with: $0) }
+            .observeOn(MainScheduler.asyncInstance)
+            .subscribe(onNext: { newWeather in
+                self.currentWeatherBGView.currentWeatherViewModel = newWeather
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func subscribeToSettingsGear() {
+        self.currentWeatherBGView.settingsTapped
+            .subscribe(onNext: { [weak self] button in
+                self?.settingsButtonTapped(sender: button)
+            })
+            .disposed(by: disposeBag)
+    }
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         if UIDevice.current.orientation.isLandscape {
             currentLocationLabel.textAlignment = .center
@@ -117,7 +137,7 @@ class MainViewController: UIViewController {
     
     // MARK: - Navigation
     
-    @IBAction func settingsButtonTapped(_ sender: UIButton) {
+    func settingsButtonTapped(sender: UIButton) {
         blurView = UIVisualEffectView(frame: self.view.frame)
         popOverToSettings(source: sender)
     }
@@ -156,22 +176,6 @@ class MainViewController: UIViewController {
 extension MainViewController: UIPopoverPresentationControllerDelegate {
     func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         return .none
-    }
-}
-
-//MARK: - WeatherInfoDelegate
-extension MainViewController: WeatherInfoDelegate {
-    func received(currentWeather: CurrentWeather) {
-//        currentLocationLabel.text = currentWeather.fullLocation
-//        currentConditionsLabel.text = currentWeather.conditions
-    }
-
-    func receivedHourlyWeather(forDays: [[HourlyWeather]]) {
-        
-    }
-    
-    func receivedIcon(name: String, solid: Bool) {
-        
     }
 }
 

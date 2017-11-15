@@ -19,4 +19,25 @@ struct CurrentWeather {
         self.tempF = tempF
         self.conditions = conditions
     }
+    
+    init?(with json: [String: Any]) {
+        guard let currentObservation = json["current_observation"] as? [String: Any] else {
+            print("Unable to get current weather information")
+            return nil
+        }
+        
+        guard
+            let tempF = currentObservation["temp_f"] as? Double,
+            let tempC = currentObservation["temp_c"] as? Double,
+            let conditions = currentObservation["weather"] as? String
+            else {
+                print("Unable to get current weather information from response json.")
+                return nil
+        }
+        let locationName = (currentObservation["observation_location"] as? [String: String])?["full"] ?? "Unknown Location"
+        self.fullLocation = locationName
+        self.tempC = Int(tempC.rounded())
+        self.tempF = Int(tempF.rounded())
+        self.conditions = conditions
+    }
 }

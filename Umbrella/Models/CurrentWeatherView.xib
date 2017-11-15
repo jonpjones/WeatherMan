@@ -25,7 +25,6 @@
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ftd-Ri-WYq">
                     <rect key="frame" x="98" y="90" width="180" height="60"/>
-                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="60" id="jCA-n5-c9q"/>
                         <constraint firstAttribute="width" constant="180" id="un4-Gj-37e"/>
@@ -53,7 +52,6 @@
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="spF-cj-Dq6">
                     <rect key="frame" x="131" y="155" width="115" height="30"/>
-                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="115" id="Kqq-g8-gCT"/>
                         <constraint firstAttribute="height" constant="30" id="uPC-QB-u5Q"/>
@@ -63,7 +61,6 @@
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
-            <color key="backgroundColor" red="0.77196115255355835" green="0.94357484579086304" blue="0.77426737546920776" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="tEm-LC-cu8" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="30" id="79I-hf-JJH"/>
                 <constraint firstItem="Ftd-Ri-WYq" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" constant="12" id="7fD-5V-vM0"/>

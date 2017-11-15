@@ -28,13 +28,23 @@ enum NetworkError: Error {
 class RxNetworkLayer {
     
     static let shared = RxNetworkLayer(with: "60647")
-   
     
     private var weatherResponse = BehaviorSubject<[String: Any]>(value: [:])
+    
     private var bag = DisposeBag()
-    private var totalWeather: BehaviorSubject<[HourlyWeather]> = BehaviorSubject(value: [])
+    open var totalWeather: BehaviorSubject<[HourlyWeather]> = BehaviorSubject(value: [])
     
     public var currentZipcode = PublishSubject<String>()
+    
+    public var currentWeather: Observable<CurrentWeather> {
+        return self.weatherResponse.skip(1).flatMap { (response) -> Observable<CurrentWeather> in
+            if let weather = CurrentWeather(with: response) {
+                return Observable.of(weather)
+            }
+            return Observable.empty()
+        }
+    }
+    
     open var todaysWeather: Observable<[HourlyWeather]> {
         return self.totalWeather
             .asObservable()
@@ -78,7 +88,7 @@ class RxNetworkLayer {
             return Observable.empty()
         })
         
-       observableZipURL
+        observableZipURL
             .flatMap { [weak self] (url) -> Observable<[HourlyWeather]> in
                 print(url)
                 if let weather = self?.getHourlyForecast(url: url) {
@@ -95,48 +105,13 @@ class RxNetworkLayer {
         
         observableZipURL
             .flatMap { [weak self] (url) -> Observable<[String: Any]> in
-                return self?.requestHourlyForecast(from: url) ?? Observable.empty()
+                return self?.getWeatherResponse(from: url) ?? Observable.empty()
             }
             .bind(to: self.weatherResponse).disposed(by: bag)
-
     }
 }
 
 extension RxNetworkLayer {
-    func fetchIcon(iconURL: URL) -> Observable<ImageRef?> {
-        let request = URLRequest(url: iconURL)
-        if let data = URLCache.shared.cachedResponse(for: request)?.data {
-            if let image = UIImage(data: data) {
-                return Observable.of(ImageRef(image: image, url: iconURL))
-            }
-        }
-        
-        return URLSession.shared.rx.data(request: request)
-            .do(onNext: { (data) in
-                let cache = CachedURLResponse.init(response: URLResponse(), data: data)
-                URLCache.shared.storeCachedResponse(cache, for: request)
-            })
-            .map({ data -> ImageRef? in
-                if let image = UIImage(data: data) {
-                    return ImageRef(image: image, url: iconURL)
-                } else {
-                    return nil
-                }
-            })
-    }
-    
-    func getHourlyForecast(url: URL) -> Observable<[HourlyWeather]> {
-        return requestHourlyForecast(from: url)
-            .map({ json in
-                guard let hourlyForecast  = json["hourly_forecast"] as? [[String: Any]] else {
-                    throw NetworkError.hourlyForecastUnavailable
-                }
-                let hourlyCollection = hourlyForecast.flatMap(HourlyWeather.init)
-                self.addTintsTo(hourlyCollection)
-                return hourlyCollection
-            })
-    }
-    
     func addTintsTo(_ weather: [HourlyWeather]) {
         let newWeather = weather.sorted { (first, second) -> Bool in
             if let firstTemp = Int(first.tempF), let secondTemp = Int(second.tempF) {
@@ -150,7 +125,19 @@ extension RxNetworkLayer {
         minTintHour?.tintColor = UIColor.minimumBlue
     }
     
-    func requestHourlyForecast(from url: URL) -> Observable<[String: Any]> {
+    func getHourlyForecast(url: URL) -> Observable<[HourlyWeather]> {
+        return getWeatherResponse(from: url)
+            .map({ json in
+                guard let hourlyForecast  = json["hourly_forecast"] as? [[String: Any]] else {
+                    throw NetworkError.hourlyForecastUnavailable
+                }
+                let hourlyCollection = hourlyForecast.flatMap(HourlyWeather.init)
+                self.addTintsTo(hourlyCollection)
+                return hourlyCollection
+            })
+    }
+    
+    func getWeatherResponse(from url: URL) -> Observable<[String: Any]> {
         let request = URLRequest(url: url)
         return URLSession.shared.rx.response(request: request)
             .map { (response, data) -> [String: Any] in

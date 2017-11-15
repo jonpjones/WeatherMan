@@ -36,8 +36,7 @@ class HourlyCellViewModel {
     func subscribeToIconRequest() {
         ImageCache.shared.imageSubject
             .filter { [weak self] (imageRef) -> Bool in
-                let isTinted = self?.weather.tintColor != .black
-                if let cellIconURL = self?.weather.iconName.nrd_weatherIconURL(highlighted: isTinted) {
+                if let cellIconURL = self?.weather.url {
                     return imageRef.0 == cellIconURL
                 } else {
                     return false

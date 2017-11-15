@@ -43,15 +43,12 @@ class SettingsViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        CurrentSettings.sharedInstance
-            .tempStyle
+        CurrentSettings.sharedInstance.tempStyle
             .asObservable()
-            .take(1)
-            .subscribe(onNext: { tempStyle in
-                self.temperatureSegmentedControl.selectedSegmentIndex = tempStyle.rawValue
-            })
+            .map { return $0.rawValue }
+            .bind(to: self.temperatureSegmentedControl.rx.selectedSegmentIndex)
             .disposed(by: disposeBag)
-        
+
         addVibrancy(view: temperatureSegmentedControl)
         addVibrancy(view: getWeatherButton)
     }
@@ -90,23 +87,6 @@ class SettingsViewController: UIViewController {
         sender.layoutIfNeeded()
         sender.tintColorDidChange()
     }
-    
-//    @IBAction func getTheWeatherButtonTapped(_ sender: UIButton) {
-//        if zipTextField.hasText {
-//            currentSettings.zip = zipTextField.text!
-//            var request = WeatherRequest(APIKey: apiKey, zipCode: currentSettings.zip)
-//            WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: request!.URL, completion: { (success) in
-//                guard success else {
-//                    DispatchQueue.main.async {
-//                        self.presentErrorAlert()
-//                    }
-//                    return
-//                }
-//                DispatchQueue.main.async {
-//                    self.presentingViewController?.dismiss(animated: true, completion: nil)
-//                }
-//            })
-//        }
-//    }
+
 }
 
