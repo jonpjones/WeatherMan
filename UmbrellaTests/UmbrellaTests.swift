@@ -7,12 +7,15 @@
 //
 
 import XCTest
+import RxSwift
 @testable import Umbrella
 
 class UmbrellaTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
+
+       // let weather = CurrentWeather(with: )
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
     
