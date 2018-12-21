@@ -21,7 +21,6 @@ class MainViewController: UIViewController {
     
     var blurView: UIVisualEffectView?
     var daysHourlyWeatherArray: [[HourlyWeather]]?
-    let transition = TableViewTransitioner()
     
     @IBOutlet weak var collectionView: UICollectionView!
     
@@ -111,8 +110,6 @@ extension MainViewController: WeatherInfoDelegate {
 
 // MARK: - UICollectionViewDataSource
 extension MainViewController: UICollectionViewDataSource {
-    
-    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return daysHourlyWeatherArray?.count ?? 0
     }
@@ -176,35 +173,6 @@ extension MainViewController: UICollectionViewDataSource {
                 self.view.layoutIfNeeded()
             })
         }
-    }
-}
-
-extension MainViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? HourlyWeatherCollectionViewCell
-            else {
-                return
-        }
-        cell.jiggle()
-        
-        if let sampleVC = storyboard?.instantiateViewController(withIdentifier: "SampleVC") as? SampleViewController {
-            sampleVC.sourceFrame = cell.superview?.convert(cell.frame, to: nil)
-            sampleVC.transitioningDelegate = self
-            transition.sourceRect = cell.superview!.convert(cell.frame, to: nil)
-            present(sampleVC, animated: true, completion: nil)
-        }
-    }
-}
-
-extension MainViewController: UIViewControllerTransitioningDelegate {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.isPresenting = true
-        return transition
-    }
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.isPresenting = false
-        return transition
     }
 }
 
