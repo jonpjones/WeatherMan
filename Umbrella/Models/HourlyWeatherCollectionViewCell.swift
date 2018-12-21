@@ -105,9 +105,4 @@ class HourlyWeatherCollectionViewCell: UICollectionViewCell {
             
         }
     }
-    
-    func unPop() {
-        
-        
-    }
 }

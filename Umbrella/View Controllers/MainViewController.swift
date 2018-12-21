@@ -28,15 +28,6 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         weatherInfo.delegate = self
-//        var weatherRequest = WeatherRequest(APIKey: apiKey)
-//        weatherRequest.zipCode = currentSettings.zip
-//        let url = weatherRequest.URL
-//        WeatherAPIManager.sharedInstance.fetchHourlyForecast(fromURL: url!) { (success) in
-//            guard success else {
-//                self.presentErrorAlert()
-//                return
-//            }
-//        }
     }
     
     
@@ -77,7 +68,6 @@ extension MainViewController: SettingsViewControllerDelegate {
         let currentTemp = currentSettings.fahrenheight ? weatherInfo.currentWeather?.tempF : weatherInfo.currentWeather?.tempC
         
         currentTempLabel.text = "\(currentTemp ?? 0)˚"
-       // collectionView.reloadData()
     }
 }
 
@@ -116,7 +106,6 @@ extension MainViewController: WeatherInfoDelegate {
             }
         }
         collectionView.reloadData()
-      //  collectionView.reloadItems(at: indexPathsToUpdate)
     }
 }
 
